@@ -34,17 +34,23 @@ export default function Home() {
             <div className="absolute inset-0 overflow-hidden bg-gradient-to-b from-purple-500/10 to-transparent pointer-events-none" />
             <div className="relative z-10 overflow-hidden">
               <WonderCard wonder={selectedWonder} />
+             
             </div>
+            
           </div>
+          
         )}
       </section>
 
       <section className="relative z-10 px-4 py-16 bg-gradient-to-b from-black via-zinc-950 to-black">
         {/* Locked wonders first */}
         {lockedWonders.length > 0 && (
+          
           <div className="max-w-7xl mx-auto mb-20">
+             <h3>Cliquez sur les pins du globe pour explorer les merveilles.</h3>
             <div className="flex items-center gap-3 mb-10 animate-fadeInUp">
               <div className="h-1 w-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-full" />
+              
               <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-orange-400">
                 À découvrir
               </h2>
