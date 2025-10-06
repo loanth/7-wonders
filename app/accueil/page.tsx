@@ -90,7 +90,7 @@ export default function AccueilPage() {
                 className={`cursor-pointer transition-all hover:scale-105 ${
                   isCompleted ? "bg-green-50 border-green-500" : ""
                 }`}
-                onClick={() => router.push(`/enigme/${enigme.id}`)}
+                onClick={() => router.push(`/enigme${enigme.id}`)}
               >
                 <CardHeader>
                   <div className="flex items-center justify-between">

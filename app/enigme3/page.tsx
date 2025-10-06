@@ -1,15 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter, useParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 
-export default function EnigmePage() {
+export default function Enigme3Page() {
   const router = useRouter()
-  const params = useParams()
-  const enigmeId = params.id as string
   const [loading, setLoading] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
 
@@ -20,9 +18,8 @@ export default function EnigmePage() {
       return
     }
 
-    // Vérifier si l'énigme est déjà résolue
     checkEnigmeStatus(partieId)
-  }, [router, enigmeId])
+  }, [router])
 
   const checkEnigmeStatus = async (partieId: string) => {
     try {
@@ -30,7 +27,7 @@ export default function EnigmePage() {
       const data = await response.json()
 
       if (response.ok) {
-        setIsCompleted(data[`m${enigmeId}`])
+        setIsCompleted(data.m3)
       }
     } catch (error) {
       console.error("Erreur:", error)
@@ -55,14 +52,13 @@ export default function EnigmePage() {
         },
         body: JSON.stringify({
           partieId: Number.parseInt(partieId),
-          enigmeId: Number.parseInt(enigmeId),
+          enigmeId: 3,
         }),
       })
 
       const data = await response.json()
 
       if (response.ok) {
-        // Rediriger vers la page d'accueil
         router.push("/accueil")
       } else {
         alert(data.error || "Erreur lors de la validation")
@@ -73,16 +69,6 @@ export default function EnigmePage() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const enigmeTitles: { [key: string]: string } = {
-    "1": "Énigme 1",
-    "2": "Énigme 2",
-    "3": "Énigme 3",
-    "4": "Énigme 4",
-    "5": "Énigme 5",
-    "6": "Énigme 6",
-    "7": "Énigme 7",
   }
 
   return (
@@ -99,14 +85,14 @@ export default function EnigmePage() {
 
         <Card className="shadow-2xl">
           <CardHeader>
-            <CardTitle className="text-3xl">{enigmeTitles[enigmeId] || `Énigme ${enigmeId}`}</CardTitle>
+            <CardTitle className="text-3xl">Énigme 3</CardTitle>
             <CardDescription>
               {isCompleted ? "Vous avez déjà résolu cette énigme !" : "Résolvez cette énigme pour continuer"}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="bg-slate-50 p-8 rounded-lg min-h-[300px] flex items-center justify-center">
-              <p className="text-gray-500 text-center">Le contenu de l'énigme sera ajouté ici</p>
+              <p className="text-gray-500 text-center">Le contenu de l'énigme 3 sera ajouté ici</p>
             </div>
 
             <Button
