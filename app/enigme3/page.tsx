@@ -4,12 +4,15 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { ArrowLeft } from "lucide-react"
 
 export default function Enigme3Page() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
+  const [userAnswer, setUserAnswer] = useState("")
+  const [feedback, setFeedback] = useState("")
 
   useEffect(() => {
     const partieId = localStorage.getItem("partieId")
@@ -31,6 +34,15 @@ export default function Enigme3Page() {
       }
     } catch (error) {
       console.error("Erreur:", error)
+    }
+  }
+
+  const handleCheckAnswer = () => {
+    const correctAnswer = 16 // ✅ A = 16 (x=3, y=2x, z=y+1, A=x+y+z)
+    if (parseInt(userAnswer) === correctAnswer) {
+      setFeedback("✅ Bonne réponse ! Vous pouvez valider l’énigme.")
+    } else {
+      setFeedback("❌ Mauvaise réponse, essayez encore !")
     }
   }
 
@@ -87,21 +99,63 @@ export default function Enigme3Page() {
           <CardHeader>
             <CardTitle className="text-3xl">Énigme 3</CardTitle>
             <CardDescription>
-              {isCompleted ? "Vous avez déjà résolu cette énigme !" : "Résolvez cette énigme pour continuer"}
+              {isCompleted
+                ? "Vous avez déjà résolu cette énigme !"
+                : "Résolvez cette énigme pour continuer"}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="bg-slate-50 p-8 rounded-lg min-h-[300px] flex items-center justify-center">
-              <p className="text-gray-500 text-center">Le contenu de l'énigme 3 sera ajouté ici</p>
+            <div className="bg-slate-50 p-6 rounded-lg text-gray-800">
+              <p className="leading-relaxed">
+                Trois nombres forment une suite secrète :
+                <br />
+                <br />
+                x = 3<br />
+                y = 2x<br />
+                z = y + 1<br />
+                <br />
+                Calcule :
+                <br />
+                <strong>A = x + y + z</strong>
+                <br />
+                <br />
+                <em>Quel est le numéro de A ?</em>
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <Input
+                type="number"
+                placeholder="Votre réponse..."
+                value={userAnswer}
+                onChange={(e) => setUserAnswer(e.target.value)}
+                disabled={isCompleted}
+              />
+              <Button
+                variant="outline"
+                onClick={handleCheckAnswer}
+                disabled={isCompleted}
+              >
+                Vérifier ma réponse
+              </Button>
+              {feedback && (
+                <p
+                  className={`text-center text-lg ${
+                    feedback.includes("✅") ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  {feedback}
+                </p>
+              )}
             </div>
 
             <Button
               onClick={handleValidate}
-              disabled={loading || isCompleted}
+              disabled={loading || isCompleted || !feedback.includes("✅")}
               className="w-full text-lg py-6"
               size="lg"
             >
-              {loading ? "Validation..." : isCompleted ? "Déjà validée ✓" : "Valider"}
+              {loading ? "Validation..." : isCompleted ? "Déjà validée ✓" : "Valider l’énigme"}
             </Button>
           </CardContent>
         </Card>
