@@ -137,7 +137,7 @@ export default function Enigme6Page() {
       await fetch("/api/enigme/validate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ partieId: Number.parseInt(partieId), enigmeId: 1 }),
+        body: JSON.stringify({ partieId: Number.parseInt(partieId), enigmeId: 6 }),
       })
     } catch (error) {
       console.error(error)
