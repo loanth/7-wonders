@@ -75,7 +75,7 @@ export function WonderCard({ wonder }: WonderCardProps) {
             className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white border-0 shadow-lg shadow-purple-500/50 hover:shadow-purple-500/70 transition-all duration-300 hover:scale-105"
             size="lg"
           >
-            <Link href="/">
+            <Link href={`/enigme${wonder.id}`}>
               <Sparkles className="h-4 w-4 mr-2" />
               S&apos;y rendre
             </Link>
