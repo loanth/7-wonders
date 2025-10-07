@@ -47,7 +47,7 @@ export default function Home() {
         localStorage.setItem("partieId", data.partieId)
         localStorage.setItem("userId", data.userId)
         localStorage.setItem("pseudo", pseudo.trim())
-        router.push("/accueil")
+        router.push("/accueil/intro")
       } else {
         alert(data.error || "Erreur lors de la création de la partie")
       }
