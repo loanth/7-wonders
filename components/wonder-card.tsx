@@ -11,7 +11,8 @@ interface WonderCardProps {
 }
 
 export function WonderCard({ wonder }: WonderCardProps) {
-  const isLocked = wonder.status === "locked"
+  const isLocked = wonder.status !== "completed"
+
 
   return (
     <Card className="group relative overflow-hidden border-2 bg-gradient-to-br from-zinc-900/90 to-zinc-950/90 backdrop-blur-sm border-zinc-800 hover:border-purple-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-2">
@@ -26,26 +27,15 @@ export function WonderCard({ wonder }: WonderCardProps) {
           className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-1"
         />
         <div className="absolute top-4 right-4 z-20">
+          {isLocked && (
           <Badge
-            variant={isLocked ? "destructive" : "default"}
-            className={`${
-              isLocked
-                ? "bg-red-600/90 text-white border border-red-400/50 shadow-lg shadow-red-500/50"
-                : "bg-green-600/90 text-white border border-green-400/50 shadow-lg shadow-green-500/50"
-            } flex items-center gap-1.5 px-3 py-1.5 backdrop-blur-sm transition-all duration-300 hover:scale-110`}
+            variant="destructive"
+            className="bg-red-600/90 text-white border border-red-400/50 shadow-lg shadow-red-500/50 flex items-center gap-1.5 px-3 py-1.5 backdrop-blur-sm transition-all duration-300 hover:scale-110"
           >
-            {isLocked ? (
-              <>
-                <Lock className="h-3.5 w-3.5 animate-pulse" />
-                A faire
-              </>
-            ) : (
-              <>
-                <CheckCircle2 className="h-3.5 w-3.5" />
-                Complété
-              </>
-            )}
+            <Lock className="h-3.5 w-3.5 animate-pulse" />
+            A faire
           </Badge>
+        )}
         </div>
         <div className="absolute top-4 left-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
           <Sparkles className="h-5 w-5 text-purple-400 animate-pulse" />

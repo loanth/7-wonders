@@ -90,7 +90,7 @@ export default function Enigme1Page() {
     <div
       className="relative w-screen h-screen bg-cover bg-center flex items-end justify-center text-white"
       style={{
-        backgroundImage: "url('/images/fond-enigme1.jpg')", // 🔧 ton fond ici
+        backgroundImage: "url('https://cdn.futura-sciences.com/buildsv6/images/largeoriginal/7/0/5/705121344c_110004_colisee-rome.jpg')", // 🔧 ton fond ici
       }}
     >
       {/* Dialogue */}
@@ -129,9 +129,9 @@ export default function Enigme1Page() {
 
       {/* 👤 Personnage */}
       <img
-        src="/images/personnage.png"
+        src="/img/pngtree-cartoon-character-of-greek-ancient-warrior-holding-spear-and-shield-png-image_11960426-removebg-preview.png"
         alt="Personnage"
-        className="absolute bottom-0 right-0 w-48 md:w-64 select-none pointer-events-none"
+        className="absolute bottom-0 right-0 w-[500px] md:w-[500px] select-none pointer-events-none"
       />
     </div>
   )

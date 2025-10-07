@@ -35,3 +35,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Erreur serveur lors de la validation de l'énigme" }, { status: 500 })
   }
 }
+
+
