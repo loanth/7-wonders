@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { useTimer } from "@/context/TimerContext"
 
 export default function EnigmeChichenItzaPage() {
   const router = useRouter()
+   const { timeLeft, formatTime } = useTimer()
   const [dialogueIndex, setDialogueIndex] = useState(0)
   const [isDialogueFinished, setIsDialogueFinished] = useState(false)
   const [answer, setAnswer] = useState("")
@@ -246,6 +248,10 @@ export default function EnigmeChichenItzaPage() {
           "url('https://upload.wikimedia.org/wikipedia/commons/8/8d/El_Castillo_Stitch_2008_Edit_1.jpg')",
       }}
     >
+      {/* Timer */}
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
+        ⏱️ {formatTime(timeLeft)}
+      </div>
       {!isDialogueFinished && !postPhase && !showQuiz && (
         <div className="absolute bottom-8 w-[90%] max-w-4xl bg-black/50 backdrop-blur-sm rounded-xl p-6 border border-yellow-300/20 text-lg text-center">
           {dialogues[dialogueIndex]}

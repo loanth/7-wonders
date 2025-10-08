@@ -1,8 +1,6 @@
 "use client"
 
 import type React from "react"
-import { useEffect, useState } from "react"
-
 import { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import dynamic from "next/dynamic"
@@ -50,6 +48,10 @@ export default function Home() {
         localStorage.setItem("partieId", data.partieId)
         localStorage.setItem("userId", data.userId)
         localStorage.setItem("pseudo", pseudo.trim())
+
+        // 🔥 Reset timerStart à 45 min
+        localStorage.setItem("timerStart", Date.now().toString())
+
         router.push("/accueil")
       } else {
         alert(data.error || "Erreur lors de la création de la partie")
@@ -62,23 +64,49 @@ export default function Home() {
     }
   }
 
-  // --- Parties publiques (consultation) ---
+  // --- Parties publiques ---
   type PublicPartie = {
     id: number
     players: number
-    progress: number // 0..100
+    progress: number
     created_at: string
+    timeLeft?: number
   }
 
   const [openPublic, setOpenPublic] = useState(false)
   const [publicLoading, setPublicLoading] = useState(false)
   const [publicError, setPublicError] = useState<string | null>(null)
   const [publicParties, setPublicParties] = useState<PublicPartie[]>([])
-
+  const [joinLoadingId, setJoinLoadingId] = useState<number | null>(null)
   const controller = useMemo(() => new AbortController(), [openPublic])
 
-  // Rejoindre une partie publique avec le pseudo saisi
-  const [joinLoadingId, setJoinLoadingId] = useState<number | null>(null)
+  // 🔁 Fetch des parties publiques
+  const fetchPublicParties = async () => {
+    setPublicError(null)
+    setPublicLoading(true)
+    try {
+      const res = await fetch(`/api/partie/public?limit=50`, { signal: controller.signal })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({} as any))
+        throw new Error(data?.error || `Erreur ${res.status}`)
+      }
+      const data = await res.json()
+      const parties = Array.isArray(data.parties) ? data.parties : []
+      setPublicParties(parties)
+
+      // 🔥 Mettre à jour timerStart avec le timeLeft de la première partie si présent
+      if (parties[0]?.timeLeft) {
+        const newStart = Date.now() - (45 * 60 - parties[0].timeLeft) * 1000
+        localStorage.setItem("timerStart", newStart.toString())
+      }
+    } catch (e: any) {
+      if (e?.name !== "AbortError") setPublicError(e?.message || "Erreur inconnue")
+    } finally {
+      setPublicLoading(false)
+    }
+  }
+
+  // 🔐 Rejoindre une partie publique
   const handleJoinPartie = async (partieId: number) => {
     const name = pseudo.trim()
     if (!name) {
@@ -97,9 +125,17 @@ export default function Home() {
         alert(data?.error || "Erreur lors de la connexion à la partie")
         return
       }
+
       localStorage.setItem("partieId", String(data.partieId))
       localStorage.setItem("userId", String(data.userId))
       localStorage.setItem("pseudo", name)
+
+      // 🔥 Set timerStart avec le timeLeft de la partie jointe
+      if (data.timeLeft) {
+        const newStart = Date.now() - (45 * 60 - data.timeLeft) * 1000
+        localStorage.setItem("timerStart", newStart.toString())
+      }
+
       router.push("/accueil")
     } catch (e) {
       console.error("Erreur lors de la jointure:", e)
@@ -109,31 +145,11 @@ export default function Home() {
     }
   }
 
-  const fetchPublicParties = async () => {
-    setPublicError(null)
-    setPublicLoading(true)
-    try {
-      const res = await fetch(`/api/partie/public?limit=50`, { signal: controller.signal })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({} as any))
-        throw new Error(data?.error || `Erreur ${res.status}`)
-      }
-      const data = await res.json()
-      setPublicParties(Array.isArray(data.parties) ? data.parties : [])
-    } catch (e: any) {
-      if (e?.name !== "AbortError") setPublicError(e?.message || "Erreur inconnue")
-    } finally {
-      setPublicLoading(false)
-    }
-  }
-
   useEffect(() => {
     if (openPublic) {
-      setPublicParties((prev) => prev)
       fetchPublicParties()
       return () => controller.abort()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openPublic])
 
   const formatDate = (dateStr: string) => {
@@ -147,7 +163,7 @@ export default function Home() {
 
   return (
     <main className="relative min-h-screen w-full overflow-hidden bg-black text-white">
-      {/* Fond 3D Terre qui tourne */}
+      {/* Fond 3D */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 pointer-events-none">
           <div
@@ -155,12 +171,10 @@ export default function Home() {
             style={{
               animationDuration: '120s',
               animationTimingFunction: 'linear',
-              animationPlayState: openPublic ? 'paused' as const : 'running' as const,
+              animationPlayState: openPublic ? 'paused' : 'running',
             }}
           >
-            {!openPublic && (
-              <SplineBg className="transform-gpu origin-center scale-[1.8] -translate-x-[5%]" />
-            )}
+            {!openPublic && <SplineBg className="transform-gpu origin-center scale-[1.8] -translate-x-[5%]" />}
           </div>
         </div>
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900/30 via-black to-pink-900/30 pointer-events-none" />
@@ -168,10 +182,7 @@ export default function Home() {
         <div className={`absolute inset-0 pointer-events-none ${openPublic ? '' : 'backdrop-blur-[1px]'}`} />
       </div>
 
-   
-    
-
-      {/* Contenu centré */}
+      {/* Contenu */}
       <div className="relative z-10 flex min-h-screen items-center justify-center p-4">
         <Card className="w-full max-w-md bg-zinc-900/60 backdrop-blur-xl border border-purple-500/30 shadow-2xl shadow-purple-500/20">
           <CardHeader className="text-center">
@@ -213,7 +224,7 @@ export default function Home() {
                   {loading ? "Création..." : "Créer la partie"}
                 </Button>
 
-                {/* Bouton pour consulter les parties en cours */}
+                {/* Bouton pour consulter les parties publiques */}
                 <Dialog open={openPublic} onOpenChange={setOpenPublic}>
                   <DialogTrigger asChild>
                     <Button type="button" variant="outline" className="w-full border-purple-500/30 text-purple-200 hover:bg-purple-500/10">
@@ -248,11 +259,9 @@ export default function Home() {
                             {publicLoading && publicParties.length === 0 && (
                               <div className="p-6 text-center text-zinc-400">Chargement des parties...</div>
                             )}
-
                             {!publicLoading && publicParties.length === 0 && !publicError && (
                               <div className="p-6 text-center text-zinc-400">Aucune partie publique en cours pour le moment.</div>
                             )}
-
                             {publicParties.map((p) => (
                               <div key={p.id} className="p-4 flex flex-col gap-2 hover:bg-zinc-900/40 transition-colors">
                                 <div className="flex items-center justify-between gap-3">
