@@ -16,8 +16,14 @@ export default function Enigme3Page() {
   const [feedback, setFeedback] = useState("")
   const [dialogueIndex, setDialogueIndex] = useState(0)
   const [showDialogue, setShowDialogue] = useState(true)
+  const [showQuizIntro, setShowQuizIntro] = useState(false)
+  const [showQuiz, setShowQuiz] = useState(false)
+  const [currentQuestion, setCurrentQuestion] = useState(0)
+  const [quizFeedback, setQuizFeedback] = useState("")
+  const [quizCompleted, setQuizCompleted] = useState(false)
+  const [enigmeDone, setEnigmeDone] = useState(false)
 
-  // 💬 Dialogues du guide indien (5-6 clics)
+  // 💬 Dialogues du guide indien pour l'histoire
   const dialogues = [
     "Namasté ! Bienvenue devant le majestueux Taj Mahal.",
     "Ce monument est un symbole d'amour éternel et de l'architecture indienne.",
@@ -27,18 +33,56 @@ export default function Enigme3Page() {
     "À toi de deviner le nombre A à partir des indices que je vais te laisser."
   ]
 
-  // 💡 Valeur correcte de A
-  const correctA = 36 // X+Y=7, X*Y=10 => Z=X²+Y²=29, A=Z+X+Y=36
-
-  useEffect(() => {
-    const partieId = localStorage.getItem("partieId")
-    if (!partieId) {
-      router.push("/")
-      return
+  // Quiz
+  const quizQuestions = [
+    {
+      question: "Le Taj Mahal a été construit pour :",
+      options: [
+        "Célébrer une victoire militaire",
+        "Servir de palais impérial",
+        "Honorer la mémoire d’une épouse défunte",
+        "Accueillir des réunions religieuses"
+      ],
+      answer: 2
+    },
+    {
+      question: "Dans quelle ville se trouve le Taj Mahal ?",
+      options: ["Jaipur", "New Delhi", "Agra", "Mumbai"],
+      answer: 2
+    },
+    {
+      question: "Quelle pierre précieuse est utilisée dans la décoration du Taj Mahal ?",
+      options: [
+        "Le diamant",
+        "Le marbre blanc incrusté de pierres semi-précieuses",
+        "Le granit noir",
+        "Le jade vert"
+      ],
+      answer: 1
+    },
+    {
+      question: "En Inde, la vache est considérée comme :",
+      options: ["Un animal sacré", "Un animal de compagnie", "Un animal nuisible", "Une légende"],
+      answer: 0
+    },
+    {
+      question: "En quelle année la construction du Taj Mahal a-t-elle commencé ?",
+      options: ["1550", "1632", "1700", "1805"],
+      answer: 1
     }
+  ]
 
-    checkEnigmeStatus(partieId)
-  }, [router])
+  const correctA = 36 // X+Y=7, X*Y=10 => X²+Y²=29=Z, Z+X+Y=36
+
+  // useEffect(() => {
+  //   const partieId = localStorage.getItem("partieId")
+  //   if (!partieId) {
+  //     router.push("/")
+  //     return
+  //   }
+
+  //   checkEnigmeStatus(partieId)
+  // }, [router])
 
   const checkEnigmeStatus = async (partieId: string) => {
     try {
@@ -52,9 +96,11 @@ export default function Enigme3Page() {
 
   const handleCheckAnswer = () => {
     if (parseInt(userAnswer) === correctA) {
-      setFeedback("✅ Bonne réponse ! Vous pouvez valider l’énigme.")
+      setQuizFeedback("")
+      setFeedback("✅ Bonne réponse !✅")
+      setShowQuizIntro(true) // Lancer intro quiz
     } else {
-      setFeedback("❌ Mauvaise réponse, essayez encore !")
+      setFeedback("❌ Mauvaise réponse, essayez encore !❌")
     }
   }
 
@@ -70,7 +116,7 @@ export default function Enigme3Page() {
       const response = await fetch("/api/enigme/validate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ partieId: Number.parseInt(partieId), enigmeId: 3 }),
+        body: JSON.stringify({ partieId: Number.parseInt(partieId), enigmeId: 3 })
       })
       const data = await response.json()
       if (response.ok) router.push("/accueil")
@@ -88,6 +134,28 @@ export default function Enigme3Page() {
       setDialogueIndex(dialogueIndex + 1)
     } else {
       setShowDialogue(false)
+    }
+  }
+
+  const handleQuizAnswer = (index: number) => {
+    const q = quizQuestions[currentQuestion]
+    if (index === q.answer) {
+      setQuizFeedback("✅ Bonne réponse ! ✅")
+      if (currentQuestion + 1 < quizQuestions.length) {
+        setTimeout(() => {
+          setCurrentQuestion(currentQuestion + 1)
+          setQuizFeedback("")
+        }, 500)
+      } else {
+        // Quiz terminé
+        setTimeout(() => {
+          setQuizFeedback("")
+          setQuizCompleted(true)
+          setEnigmeDone(true) // bloque l'affichage de l'énigme
+        }, 500)
+      }
+    } else {
+      setQuizFeedback("❌ Mauvaise réponse !❌")
     }
   }
 
@@ -114,7 +182,7 @@ export default function Enigme3Page() {
         </Button>
       </div>
 
-      {/* 👳‍♂️ Guide indien avec dialogues */}
+      {/* 👳‍♂️ Dialogue indien */}
       {showDialogue && (
         <div
           className="absolute bottom-6 left-6 flex items-end space-x-4 cursor-pointer z-40"
@@ -123,8 +191,8 @@ export default function Enigme3Page() {
           <Image
             src="/ImageEnigme3/image-indien.png"
             alt="Guide indien"
-            width={160}
-            height={160}
+            width={300}
+            height={300}
             className="rounded-full border-4 border-yellow-400 shadow-2xl"
           />
           <div className="bg-black/70 p-4 rounded-xl max-w-md text-sm md:text-base transition-all duration-300">
@@ -136,8 +204,8 @@ export default function Enigme3Page() {
         </div>
       )}
 
-      {/* 🧩 Contenu principal */}
-      {!showDialogue && (
+      {/* 🧩 Enigme */}
+      {!showDialogue && !showQuizIntro && !showQuiz && !enigmeDone && (
         <div className="relative z-20 flex justify-center items-center min-h-screen px-4 md:px-8">
           <Card className="bg-white/80 backdrop-blur-md text-gray-800 shadow-2xl max-w-3xl w-full border border-purple-200">
             <CardHeader>
@@ -149,9 +217,11 @@ export default function Enigme3Page() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* 🔢 Calcul avec images (résultats visibles, valeurs X/Y/Z cachées) */}
+              {/* 🔢 Calcul avec images */}
               <div className="bg-slate-50 p-6 rounded-lg text-gray-800 text-center">
-                <p className="mb-4 text-lg font-semibold text-purple-700">Les symboles de la sagesse :</p>
+                <p className="mb-4 text-lg font-semibold text-purple-700">
+                  Les symboles de la sagesse :
+                </p>
 
                 <div className="flex flex-col items-center gap-4 mb-4">
                   <div className="flex items-center gap-2">
@@ -196,33 +266,85 @@ export default function Enigme3Page() {
                   disabled={isCompleted}
                   className="text-center"
                 />
-                <Button
-                  variant="outline"
-                  onClick={handleCheckAnswer}
-                  disabled={isCompleted}
-                >
+                <Button variant="outline" onClick={handleCheckAnswer} disabled={isCompleted}>
                   Vérifier ma réponse
                 </Button>
                 {feedback && (
                   <p
-                    className={`text-center text-lg ${feedback.includes("✅") ? "text-green-600" : "text-red-600"}`}
+                    className={`text-center text-lg ${
+                      feedback.includes("✅") ? "text-green-600" : "text-red-600"
+                    }`}
                   >
                     {feedback}
                   </p>
                 )}
               </div>
-
-              {/* ✅ Validation */}
-              <Button
-                onClick={handleValidate}
-                disabled={loading || isCompleted || !feedback.includes("✅")}
-                className="w-full text-lg py-6"
-                size="lg"
-              >
-                {loading ? "Validation..." : isCompleted ? "Déjà validée ✓" : "Valider l’énigme"}
-              </Button>
             </CardContent>
           </Card>
+        </div>
+      )}
+
+      {/* 👳‍♂️ Intro quiz après réussite énigme */}
+      {showQuizIntro && (
+        <div className="absolute bottom-6 left-6 flex items-end space-x-4 z-40">
+          <Image
+            src="/ImageEnigme3/image-indien.png"
+            alt="Guide indien"
+            width={250}
+            height={250}
+            className="rounded-full border-4 border-yellow-400 shadow-2xl"
+          />
+          <div className="bg-black/70 p-4 rounded-xl max-w-md text-sm md:text-base">
+            <p>🎉 Bravo pour avoir résolu l'énigme !🎉</p>
+            <p>Il reste maintenant un petit quiz de culture générale sur l'Inde et le Taj Mahal.</p>
+            <Button
+              className="mt-2"
+              onClick={() => {
+                setShowQuizIntro(false)
+                setShowQuiz(true)
+              }}
+            >
+              Commencer le quiz
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* 📝 Quiz */}
+      {showQuiz && !quizCompleted && (
+        <div className="relative z-20 flex justify-center items-center min-h-screen px-4 md:px-8">
+          <Card className="bg-white/90 text-gray-800 shadow-2xl max-w-3xl w-full border border-purple-200">
+            <CardHeader>
+              <CardTitle className="text-2xl text-center">
+                Question {currentQuestion + 1} / {quizQuestions.length}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-lg text-center font-semibold">{quizQuestions[currentQuestion].question}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                {quizQuestions[currentQuestion].options.map((opt, i) => (
+                  <Button key={i} onClick={() => handleQuizAnswer(i)}>
+                    {opt}
+                  </Button>
+                ))}
+              </div>
+              {quizFeedback && (
+                <p className={`text-center text-lg ${quizFeedback.includes("✅") ? "text-green-600" : "text-red-600"}`}>
+                  {quizFeedback}
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* 🎉 Quiz terminé, bouton validation */}
+      {quizCompleted && (
+        <div className="relative z-20 flex flex-col justify-center items-center min-h-screen px-4 md:px-8 text-center gap-4">
+          <p className="text-2xl font-bold text-yellow-400">🎉 Félicitations ! Vous avez terminé le quiz !🎉</p>
+          <Button onClick={handleValidate} disabled={loading} size="lg">
+            {loading ? "Validation..." : "Valider l’énigme"}
+          </Button>
         </div>
       )}
     </div>
