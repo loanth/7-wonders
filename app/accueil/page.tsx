@@ -1,10 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
 import SplineScene from "@/components/SplineScene"
+import { useSearchParams, useRouter } from "next/navigation"
 import { WonderCard } from "@/components/wonder-card"
 import { wonders } from "@/lib/wonders"
+import { Sparkles } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { useTimer } from "@/context/TimerContext"
 
 export default function Home() {
   const searchParams = useSearchParams()
