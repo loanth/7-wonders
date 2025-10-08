@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     const columnName = `m${enigmeId}`
 
     // Mettre à jour la colonne correspondante à TRUE
-    const [result] = await pool.query<ResultSetHeader>(`UPDATE partie SET ${columnName} = TRUE WHERE id = ?`, [
+    const [result] = await pool.query<ResultSetHeader>(`UPDATE workshop_partie SET ${columnName} = TRUE WHERE id = ?`, [
       partieId,
     ])
 

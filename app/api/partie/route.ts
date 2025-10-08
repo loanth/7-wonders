@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
 
       // Vérifier si l'utilisateur existe déjà
       const [existingUsers] = await connection.query<RowDataPacket[]>(
-        "SELECT id FROM user WHERE pseudo = ?",
+        "SELECT id FROM workshop_user WHERE pseudo = ?",
         [pseudo]
       )
 
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
       } else {
         // Créer un nouvel utilisateur
         const [userResult] = await connection.query<ResultSetHeader>(
-          "INSERT INTO user (pseudo) VALUES (?)",
+          "INSERT INTO workshop_user (pseudo) VALUES (?)",
           [pseudo]
         )
         userId = userResult.insertId
@@ -37,13 +37,13 @@ export async function POST(request: NextRequest) {
 
       // Créer une nouvelle partie
       const [partieResult] = await connection.query<ResultSetHeader>(
-        "INSERT INTO partie (public) VALUES (?)",
+        "INSERT INTO workshop_partie (public) VALUES (?)",
         [isPublic ? 1 : 0]
       )
       const partieId = partieResult.insertId
 
       // Lier l'utilisateur à la partie
-      await connection.query("INSERT INTO user_partie (user_id, partie_id) VALUES (?, ?)", [userId, partieId])
+      await connection.query("INSERT INTO workshop_user_partie (user_id, partie_id) VALUES (?, ?)", [userId, partieId])
 
       await connection.commit()
 
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
     try {
       // Trouver la partie associée à cet utilisateur
       const [userPartie] = await connection.query<RowDataPacket[]>(
-        "SELECT partie_id FROM user_partie WHERE user_id = ? LIMIT 1",
+        "SELECT partie_id FROM workshop_user_partie WHERE user_id = ? LIMIT 1",
         [userId]
       )
 
@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
 
       // Récupérer les infos de la table partie
       const [partieRows] = await connection.query<RowDataPacket[]>(
-        "SELECT * FROM partie WHERE id = ?",
+        "SELECT * FROM workshop_partie WHERE id = ?",
         [partieId]
       )
 

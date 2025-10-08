@@ -19,8 +19,8 @@ export async function GET(request: NextRequest) {
             p.public,
             p.created_at,
             COUNT(up.user_id) AS players
-         FROM partie p
-         LEFT JOIN user_partie up ON up.partie_id = p.id
+         FROM workshop_partie p
+         LEFT JOIN workshop_user_partie up ON up.partie_id = p.id
          WHERE p.public = 1
            AND NOT (p.m1 = 1 AND p.m2 = 1 AND p.m3 = 1 AND p.m4 = 1 AND p.m5 = 1 AND p.m6 = 1 AND p.m7 = 1)
            AND p.created_at BETWEEN (NOW() - INTERVAL 45 MINUTE) AND NOW()
