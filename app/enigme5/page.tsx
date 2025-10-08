@@ -21,7 +21,7 @@ export default function EnigmeChichenItzaPage() {
   const [postDialogueIndex, setPostDialogueIndex] = useState(0)
   const [showVideo, setShowVideo] = useState(false)
 
-  const VIDEO_URL = "https://www.youtube.com/watch?v=ZxBuScr7hrk"
+  const VIDEO_URL = "https://www.youtube.com/embed/ZxBuScr7hrk?si=ZDOJrVSkC87KVPCd"
 
   const dialogues = [
     "Bienvenue à Chichen Itza, voyageur du temps... Je m'appelle Pedro",
@@ -187,6 +187,10 @@ export default function EnigmeChichenItzaPage() {
             "url('https://upload.wikimedia.org/wikipedia/commons/8/8d/El_Castillo_Stitch_2008_Edit_1.jpg')",
         }}
       >
+        {/* Timer */}
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
+        ⏱️ {formatTime(timeLeft)}
+      </div>
         <h1 className="text-4xl font-bold">🎉 Félicitations ! 🎉</h1>
         <p className="text-xl">
           Tu as percé le mystère de Chichen Itza et remporté le quiz maya !<br />

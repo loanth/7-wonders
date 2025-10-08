@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { useTimer } from "@/context/TimerContext"
 
 export default function Enigme1Page() {
   const router = useRouter()
@@ -19,6 +20,7 @@ export default function Enigme1Page() {
   const [postDialogueIndex, setPostDialogueIndex] = useState(0)
   const [showVideo, setShowVideo] = useState(false)
 
+  const { timeLeft, formatTime } = useTimer()
   const VIDEO_URL = "https://www.youtube.com/embed/bmvxRMYxlhE"
 
   const dialogues = [
@@ -193,6 +195,9 @@ export default function Enigme1Page() {
             "url('https://cdn.futura-sciences.com/buildsv6/images/largeoriginal/7/0/5/705121344c_110004_colisee-rome.jpg')",
         }}
       >
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-zinc-900/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
+        ⏱️ {formatTime(timeLeft)}
+      </div>
         <h1 className="text-4xl font-bold">🎉 Félicitations ! 🎉</h1>
         <p className="text-xl">
           Tu as percé le mystère du code de César et remporté le quiz du Colisée !
@@ -256,6 +261,9 @@ export default function Enigme1Page() {
           "url('https://cdn.futura-sciences.com/buildsv6/images/largeoriginal/7/0/5/705121344c_110004_colisee-rome.jpg')",
       }}
     >
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-zinc-900/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
+        ⏱️ {formatTime(timeLeft)}
+      </div>
       {!isDialogueFinished && !postPhase && !showQuiz ? (
         <div className="absolute bottom-8 w-[90%] max-w-4xl bg-black/50 backdrop-blur-sm rounded-xl p-6 border border-white/10 text-lg leading-relaxed text-center">
           {dialogues[dialogueIndex]}
