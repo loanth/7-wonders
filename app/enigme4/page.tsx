@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, HelpCircle, Lock, Unlock, Sparkles } from "lucide-react"
+import { useTimer } from "@/context/TimerContext"
 
 export default function Enigme1Page() {
   const router = useRouter()
@@ -16,6 +17,12 @@ export default function Enigme1Page() {
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
   const [quizCompleted, setQuizCompleted] = useState(false)
+  const { timeLeft, formatTime } = useTimer()
+   const [showYTVideo, setShowYTVideo] = useState(false)
+
+  const toggleYTVideo = () => {
+    setShowYTVideo(!showYTVideo)
+  }
 
   // Questions sur la Grande Muraille
 const questions = [
@@ -133,7 +140,7 @@ const solution = [
   ['和','长','勇','龙','守','坚','力','忠','智'],
   ['力','守','坚','智','长','忠','勇','和','龙'],
   ['忠','智','龙','和','力','勇','坚','守','长'],
-  ['长','坚','守','忠','勇','力','坚','守','长'],
+  ['长','坚','守','忠','勇','力','坚','龙','长'],
   ['智','和','力','长','龙','守','忠','勇','坚'],
   ['龙','勇','忠','坚','智','和','长','力','守'],
   ['勇','龙','长','守','忠','智','和','坚','力'],
@@ -144,14 +151,14 @@ const solution = [
 // Grille initiale corrigée et résoluble
 const initialGrid = [
   ['','长','','','守','坚','','忠',''],
-  ['','','坚','','长','忠','','和','龙'],
+  ['力','','坚','智','长','忠','勇','和','龙'],
   ['忠','智','龙','','力','','','',''],
-  ['','坚','','','','','','',''],
+  ['长','坚','','','勇','','','',''],
   ['','和','力','长','龙','守','忠','勇','坚'],
-  ['','','','','','和','长','力','守'],
-  ['','','长','','忠','','','坚',''],
-  ['守','','','','坚','长','龙','智','忠'],
-  ['坚','','智','力','','','守','长','']
+  ['','勇','忠','','','和','长','力','守'],
+  ['勇','','长','','忠','','','坚',''],
+  ['守','力','','','坚','长','龙','智','忠'],
+  ['坚','','智','力','','龙','守','长','']
 ];
 
 // Ensemble des chiffres utilisés
@@ -222,6 +229,52 @@ const characterNames = {
       </div>
 
       <div className="relative z-10 p-4 md:p-8">
+
+        {/* Timer */}
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
+        ⏱️ {formatTime(timeLeft)}
+      </div>
+
+
+
+          {/* Bouton "En apprendre plus" style boîte de dialogue compacte */}
+          <button
+            onClick={toggleYTVideo}
+            className="fixed top-4 left-4 z-50 bg-black/80 backdrop-blur-md border-2 border-yellow-400/50 rounded-xl p-4 shadow-2xl text-yellow-400 font-bold animate-in slide-in-from-bottom duration-700 hover:text-white hover:scale-105 transition-all"
+          >
+            En apprendre plus
+          </button>
+
+          {/* Bulle vidéo style boîte de dialogue compacte */}
+          {showYTVideo && (
+            <div className="fixed top-24 left-6 z-50 w-[580px] animate-in slide-in-from-bottom duration-700">
+              <div className="relative bg-black/80 backdrop-blur-md rounded-xl border-2 border-yellow-400/50 shadow-2xl p-4">
+                
+                {/* Petite flèche de bulle */}
+                <div className="absolute -top-3 left-10 w-0 h-0 border-l-[15px] border-l-transparent border-b-[15px] border-b-yellow-400 border-r-[15px] border-r-transparent"></div>
+
+                {/* Contenu vidéo */}
+                <div className="rounded-xl overflow-hidden border-2 border-yellow-400/50 shadow-lg">
+                  <iframe
+                    width="560"
+                    height="315"
+                    src="https://www.youtube.com/embed/dipzTdpGURw"
+                    title="La Grande Muraille de Chine - Les 7 Nouvelles Merveilles du Monde"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+              </div>
+            </div>
+          )}
+
+
+
+
+
+
+
         {/* Bouton retour stylisé */}
         <Button
           variant="ghost"
@@ -603,7 +656,7 @@ const characterNames = {
                 {/* Footer décoratif */}
                 <div className="mt-6 text-center">
                   <div className="inline-block bg-gradient-to-r from-red-800 to-orange-800 text-yellow-300 px-6 py-3 rounded-full text-sm font-semibold shadow-lg">
-                    🐉 Les neuf gardiens protègent la Muraille depuis des millénaires 🐉
+                    🐉 Le gardien protège la Muraille depuis des millénaires 🐉
                   </div>
                 </div>
               </div>
