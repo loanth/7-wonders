@@ -17,6 +17,10 @@ export default function Home() {
 
   const [partieData, setPartieData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [showFinalChallenge, setShowFinalChallenge] = useState(false)
+  const [letters, setLetters] = useState<string[]>([])
+  const [isCompleted, setIsCompleted] = useState(false)
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
 
   // 🕒 TIMER PERSISTANT 45 min (en secondes)
   const [timeLeft, setTimeLeft] = useState(45 * 60)
@@ -92,10 +96,102 @@ export default function Home() {
       })
     : []
 
+  // ✅ Vérifie si toutes les merveilles sont complètes
+  const allCompleted =
+    partieData &&
+    ["m1", "m2", "m3", "m4", "m5", "m6", "m7"].every((key) => partieData[key] === 1)
+
+  // 🧩 Ordre fixe des lettres du mot “CULTURE” (pas évident mais toujours le même)
+  useEffect(() => {
+    const fixedOrder = ["R", "T", "E", "U", "L", "C", "U"] // RTEULCU
+    setLetters(fixedOrder)
+  }, [showFinalChallenge])
+
+  // 🔁 Fonction de permutation des lettres
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index)
+  }
+
+  const handleDrop = (index: number) => {
+    if (draggedIndex === null) return
+    const updated = [...letters]
+    const [moved] = updated.splice(draggedIndex, 1)
+    updated.splice(index, 0, moved)
+    setLetters(updated)
+    setDraggedIndex(null)
+  }
+
+  // ✅ Vérifie si le mot est bon
+  const checkIfCorrect = () => {
+    if (letters.join("") === "CULTURE") {
+      setIsCompleted(true)
+    } else {
+      alert("Pas encore... essaie une autre combinaison !")
+    }
+  }
+
   if (loading) {
     return <div className="text-white text-center mt-20">Chargement...</div>
   }
 
+  // 🎉 Écran final de félicitations
+  if (isCompleted) {
+    return (
+      <main className="min-h-screen flex flex-col justify-center items-center bg-black text-white">
+        <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mb-6 text-center">
+          Félicitations !
+        </h1>
+        <p className="text-lg text-gray-300 mb-10 text-center max-w-md">
+          Tu as retrouvé la <span className="text-purple-400 font-semibold">Clé des Civilisations</span> !
+          Ton voyage à travers les Merveilles touche à sa fin...
+        </p>
+        <Button
+          onClick={() => router.push("../")}
+          className="bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:scale-105 transition-transform"
+        >
+          Retour à la connexion
+        </Button>
+      </main>
+    )
+  }
+
+  // 🧩 Challenge final interactif
+  if (showFinalChallenge) {
+    return (
+      <main className="min-h-screen flex flex-col justify-center items-center bg-black text-white">
+        <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+          Dernier défi
+        </h1>
+        <p className="text-gray-300 mb-8 text-center">
+          Réarrange les lettres pour trouver le mot mystère :
+        </p>
+
+        <div className="flex gap-3 mb-6 text-3xl font-bold tracking-widest flex-wrap justify-center">
+          {letters.map((l, i) => (
+            <div
+              key={i}
+              draggable
+              onDragStart={() => handleDragStart(i)}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={() => handleDrop(i)}
+              className="bg-zinc-800 px-5 py-3 rounded-xl border border-purple-500/40 select-none cursor-move hover:bg-purple-700/30 transition-transform duration-150 active:scale-110"
+            >
+              {l}
+            </div>
+          ))}
+        </div>
+
+        <Button
+          onClick={checkIfCorrect}
+          className="bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:scale-105 transition-transform"
+        >
+          Valider le mot
+        </Button>
+      </main>
+    )
+  }
+
+  // 🌍 Page principale classique
   return (
     <main className="min-h-screen w-full bg-black text-white overflow-y-auto relative">
       {/* 🌈 Fonds animés */}
@@ -125,7 +221,6 @@ export default function Home() {
       </section>
 
       <section className="relative z-10 px-4 py-16 bg-gradient-to-b from-black via-zinc-950 to-black">
-        {/* 🔐 Locked wonders */}
         {lockedWonders.length > 0 && (
           <div className="max-w-7xl mx-auto mb-20">
             <h3>Cliquez sur les pins du globe pour explorer les merveilles.</h3>
@@ -158,7 +253,18 @@ export default function Home() {
           </div>
         )}
 
-        {/* ✅ Completed wonders */}
+        {/* 🏁 Bouton final */}
+        {allCompleted && !showFinalChallenge && (
+          <div className="flex justify-center mt-16 animate-fadeInUp">
+            <Button
+              onClick={() => setShowFinalChallenge(true)}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 text-lg hover:scale-105 transition-transform shadow-lg shadow-purple-500/30"
+            >
+              <Sparkles className="mr-2" /> Compléter l'Escape Game
+            </Button>
+          </div>
+        )}
+
         {completedWonders.length > 0 && (
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center gap-3 mb-10 animate-fadeInUp">
@@ -189,6 +295,8 @@ export default function Home() {
             </div>
           </div>
         )}
+
+        
       </section>
     </main>
   )
