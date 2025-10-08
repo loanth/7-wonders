@@ -1,8 +1,7 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import dynamic from "next/dynamic"
 import { Button } from "@/components/ui/button"
@@ -10,39 +9,37 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useTimer } from "@/context/TimerContext"
 
 const SplineBg = dynamic(() => import("@/components/SplineScene"), { ssr: false, loading: () => <div className="w-full h-full" /> })
 
 export default function Home() {
+  const { timeLeft, formatTime } = useTimer()
   const [pseudo, setPseudo] = useState("")
   const [isPublic, setIsPublic] = useState(false)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
+  // 🔄 Reset du timer à chaque chargement de page
+  useEffect(() => {
+    localStorage.removeItem("timerStart")
+  }, [])
+
   const handleCreatePartie = async (e: React.FormEvent) => {
     e.preventDefault()
-
     if (!pseudo.trim()) {
       alert("Veuillez entrer un pseudo")
       return
     }
 
     setLoading(true)
-
     try {
       const response = await fetch("/api/partie", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          pseudo: pseudo.trim(),
-          public: isPublic,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pseudo: pseudo.trim(), public: isPublic }),
       })
-
       const data = await response.json()
-
       if (response.ok) {
         localStorage.setItem("partieId", data.partieId)
         localStorage.setItem("userId", data.userId)
@@ -51,8 +48,8 @@ export default function Home() {
       } else {
         alert(data.error || "Erreur lors de la création de la partie")
       }
-    } catch (error) {
-      console.error("Erreur:", error)
+    } catch (err) {
+      console.error(err)
       alert("Erreur de connexion au serveur")
     } finally {
       setLoading(false)
@@ -68,11 +65,13 @@ export default function Home() {
             <SplineBg className="transform-gpu origin-center scale-[1.8] -translate-x-[5%]" />
           </div>
         </div>
-        {/* Voiles de dégradés pour harmoniser avec l'app */}
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900/30 via-black to-pink-900/30 pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-500/30 via-transparent to-transparent pointer-events-none" />
         <div className="absolute inset-0 backdrop-blur-[1px] pointer-events-none" />
       </div>
+
+   
+    
 
       {/* Contenu centré */}
       <div className="relative z-10 flex min-h-screen items-center justify-center p-4">
@@ -106,10 +105,7 @@ export default function Home() {
 
               <div className="flex items-center space-x-2">
                 <Checkbox id="public" checked={isPublic} onCheckedChange={(checked) => setIsPublic(checked as boolean)} />
-                <Label
-                  htmlFor="public"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                >
+                <Label htmlFor="public" className="text-sm font-medium leading-none cursor-pointer">
                   Autoriser le multijoueur
                 </Label>
               </div>
