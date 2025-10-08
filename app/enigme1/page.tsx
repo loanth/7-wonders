@@ -14,11 +14,13 @@ export default function Enigme1Page() {
   const [score, setScore] = useState(0)
   const [showCongrats, setShowCongrats] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [feedback, setFeedback] = useState<string | null>(null) // <-- message de feedback
+  const [feedback, setFeedback] = useState<string | null>(null)
   const [postPhase, setPostPhase] = useState(false)
   const [postDialogueIndex, setPostDialogueIndex] = useState(0)
+  const [showVideo, setShowVideo] = useState(false)
 
-  // 💬 Dialogue d'intro
+  const VIDEO_URL = "https://www.youtube.com/embed/bmvxRMYxlhE"
+
   const dialogues = [
     "Ah, te voilà enfin...",
     "Je suis le gardien de cette épreuve. Peu ont réussi à me vaincre.",
@@ -26,11 +28,9 @@ export default function Enigme1Page() {
     "Trouve la clé, déchiffre le texte, et tu connaîtras la lettre cachée...",
   ]
 
-  // 🧩 Code César
   const encryptedText = "Wkhswec Nomswec Wobsnsec Mrop Noc Kbwooc Ne Xybn"
   const correctAnswer = "Maximus Decimus Meridius Chef Des Armees Du Nord"
 
-  // 📚 Après la réponse juste
   const postAnswerDialogues = [
     "Impressionnant... tu as trouvé la phrase cachée.",
     "Maximus Decimus Meridius... Ce nom ne t’est pas inconnu, n’est-ce pas ?",
@@ -42,7 +42,6 @@ export default function Enigme1Page() {
     "À présent, prouve que tu mérites ton titre de gladiateur... Réponds à ces questions !",
   ]
 
-  // 🧠 Quiz
   const quiz = [
     {
       question: "Qui est le réalisateur du film Gladiator ?",
@@ -96,7 +95,6 @@ export default function Enigme1Page() {
     },
   ]
 
-  // 🎭 Gestion du dialogue initial
   useEffect(() => {
     const handleNext = (e: KeyboardEvent | MouseEvent) => {
       if (isDialogueFinished) return
@@ -125,7 +123,6 @@ export default function Enigme1Page() {
       alert("Ce n’est pas la bonne réponse…")
       return
     }
-    // Passage au dialogue post-réponse
     setIsDialogueFinished(false)
     setDialogueIndex(0)
     setShowQuiz(false)
@@ -133,7 +130,6 @@ export default function Enigme1Page() {
     setPostPhase(true)
   }
 
-  // Gestion des dialogues après la réponse correcte
   useEffect(() => {
     if (!postPhase) return
     const handleNextPost = (e: KeyboardEvent | MouseEvent) => {
@@ -190,16 +186,64 @@ export default function Enigme1Page() {
 
   if (showCongrats) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-center bg-gradient-to-br from-purple-800 to-slate-900 text-white p-8">
-        <h1 className="text-4xl font-bold mb-4">🎉 Félicitations ! 🎉</h1>
-        <p className="text-xl mb-6">
+      <div
+        className="min-h-screen flex flex-col items-center justify-center text-center text-white p-8 space-y-8 bg-cover bg-center"
+        style={{
+          backgroundImage:
+            "url('https://cdn.futura-sciences.com/buildsv6/images/largeoriginal/7/0/5/705121344c_110004_colisee-rome.jpg')",
+        }}
+      >
+        <h1 className="text-4xl font-bold">🎉 Félicitations ! 🎉</h1>
+        <p className="text-xl">
           Tu as percé le mystère du code de César et remporté le quiz du Colisée !
           <br />
-          Tu gagnes la lettre <span className="text-yellow-300 font-bold text-2xl">U</span>.
+          Tu gagnes la lettre{" "}
+          <span className="text-yellow-300 font-bold text-2xl">U</span>.
         </p>
-        <Button onClick={() => router.push("/accueil")} size="lg">
-          Retour à l'accueil
-        </Button>
+
+        {/* 🏛️ Carte interactive du Colisée */}
+        <div className="w-full max-w-3xl h-[400px] border-2 border-yellow-400 rounded-2xl overflow-hidden shadow-lg">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2994.349008253049!2d12.49004267644524!3d41.89021417129277!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x132f61a1362d1c81%3A0x90a70d9b1e0b4cfb!2sColosseum!5e0!3m2!1sen!2sit!4v1715340497312!5m2!1sen!2sit"
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+          ></iframe>
+        </div>
+
+        {!showVideo && (
+          <Button
+            onClick={() => setShowVideo(true)}
+            className="bg-yellow-500 hover:bg-yellow-400 text-black w-full max-w-sm py-3"
+          >
+            Suivant
+          </Button>
+        )}
+
+        {showVideo && (
+          <div className="w-full max-w-3xl aspect-video rounded-xl overflow-hidden border-2 border-yellow-400 shadow-lg">
+            <iframe
+              width="100%"
+              height="100%"
+              src={VIDEO_URL}
+              title="Vidéo du Colisée"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
+        )}
+
+        {showVideo && (
+          <Button
+            onClick={() => router.push("/accueil")}
+            size="lg"
+            className="bg-purple-700 hover:bg-purple-600 mt-4"
+          >
+            Retour à l'accueil
+          </Button>
+        )}
       </div>
     )
   }
@@ -212,7 +256,6 @@ export default function Enigme1Page() {
           "url('https://cdn.futura-sciences.com/buildsv6/images/largeoriginal/7/0/5/705121344c_110004_colisee-rome.jpg')",
       }}
     >
-      {/* Dialogue principal */}
       {!isDialogueFinished && !postPhase && !showQuiz ? (
         <div className="absolute bottom-8 w-[90%] max-w-4xl bg-black/50 backdrop-blur-sm rounded-xl p-6 border border-white/10 text-lg leading-relaxed text-center">
           {dialogues[dialogueIndex]}
@@ -220,7 +263,6 @@ export default function Enigme1Page() {
         </div>
       ) : null}
 
-      {/* Enigme */}
       {isDialogueFinished && !postPhase && !showQuiz && (
         <div className="absolute bottom-12 w-[90%] max-w-3xl bg-black/60 backdrop-blur-md rounded-xl p-6 border border-purple-400/30 text-center space-y-4">
           <p className="text-lg mb-2">
@@ -248,7 +290,6 @@ export default function Enigme1Page() {
         </div>
       )}
 
-      {/* Dialogue post-réponse */}
       {postPhase && !showQuiz && (
         <div className="absolute bottom-8 w-[90%] max-w-4xl bg-black/50 backdrop-blur-sm rounded-xl p-6 border border-white/10 text-lg leading-relaxed text-center">
           {postAnswerDialogues[postDialogueIndex]}
@@ -256,7 +297,6 @@ export default function Enigme1Page() {
         </div>
       )}
 
-      {/* Quiz */}
       {showQuiz && !showCongrats && (
         <div className="absolute bottom-8 w-[90%] max-w-4xl bg-black/70 backdrop-blur-sm rounded-xl p-6 border border-yellow-400/20 text-center space-y-4">
           <h2 className="text-2xl font-bold mb-4">{quiz[quizIndex].question}</h2>
@@ -290,7 +330,6 @@ export default function Enigme1Page() {
         </div>
       )}
 
-      {/* Personnage */}
       <img
         src="/img/pngtree-cartoon-character-of-greek-ancient-warrior-holding-spear-and-shield-png-image_11960426-removebg-preview.png"
         alt="Personnage"
