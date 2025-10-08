@@ -11,7 +11,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     }
 
     const [rows] = await pool.query<RowDataPacket[]>(
-      "SELECT m1, m2, m3, m4, m5, m6, m7, public FROM partie WHERE id = ?",
+      "SELECT m1, m2, m3, m4, m5, m6, m7, public FROM workshop_partie WHERE id = ?",
       [partieId],
     )
 

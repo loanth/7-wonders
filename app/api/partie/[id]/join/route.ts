@@ -22,7 +22,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
       // Vérifier l'état de la partie
       const [partieRows] = await connection.query<RowDataPacket[]>(
-        "SELECT public, m1, m2, m3, m4, m5, m6, m7 FROM partie WHERE id = ?",
+        "SELECT public, m1, m2, m3, m4, m5, m6, m7 FROM workshop_partie WHERE id = ?",
         [partieId]
       )
       if (partieRows.length === 0) {
@@ -43,14 +43,14 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       // Trouver ou créer l'utilisateur
       let userId: number
       const [users] = await connection.query<RowDataPacket[]>(
-        "SELECT id FROM user WHERE pseudo = ?",
+        "SELECT id FROM workshop_user WHERE pseudo = ?",
         [pseudo]
       )
       if (users.length > 0) {
         userId = users[0].id
       } else {
         const [userRes] = await connection.query<ResultSetHeader>(
-          "INSERT INTO user (pseudo) VALUES (?)",
+          "INSERT INTO workshop_user (pseudo) VALUES (?)",
           [pseudo]
         )
         userId = userRes.insertId
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
       // Lier l'utilisateur à la partie (idempotent)
       await connection.query(
-        "INSERT INTO user_partie (user_id, partie_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE partie_id = VALUES(partie_id)",
+        "INSERT INTO workshop_user_partie (user_id, partie_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE partie_id = VALUES(partie_id)",
         [userId, partieId]
       )
 
