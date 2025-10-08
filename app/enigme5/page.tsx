@@ -17,6 +17,9 @@ export default function EnigmeChichenItzaPage() {
   const [feedback, setFeedback] = useState<string | null>(null)
   const [postPhase, setPostPhase] = useState(false)
   const [postDialogueIndex, setPostDialogueIndex] = useState(0)
+  const [showVideo, setShowVideo] = useState(false)
+
+  const VIDEO_URL = "https://www.youtube.com/watch?v=ZxBuScr7hrk"
 
   const dialogues = [
     "Bienvenue à Chichen Itza, voyageur du temps... Je m'appelle Pedro",
@@ -175,16 +178,62 @@ export default function EnigmeChichenItzaPage() {
 
   if (showCongrats) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-center bg-gradient-to-br from-yellow-800 to-emerald-900 text-white p-8">
-        <h1 className="text-4xl font-bold mb-4">Félicitations !</h1>
-        <p className="text-xl mb-6">
-          Tu as percé le mystère de Chichen Itza et remporté le quiz maya !
-          <br />
+      <div
+        className="min-h-screen flex flex-col items-center justify-center text-center text-white p-8 space-y-8 bg-cover bg-center"
+        style={{
+          backgroundImage:
+            "url('https://upload.wikimedia.org/wikipedia/commons/8/8d/El_Castillo_Stitch_2008_Edit_1.jpg')",
+        }}
+      >
+        <h1 className="text-4xl font-bold">🎉 Félicitations ! 🎉</h1>
+        <p className="text-xl">
+          Tu as percé le mystère de Chichen Itza et remporté le quiz maya !<br />
           Tu gagnes la lettre <span className="text-yellow-300 font-bold text-2xl">C</span>.
         </p>
-        <Button onClick={() => router.push("/accueil")} size="lg">
-          Retour à l'accueil
-        </Button>
+
+        {/* 🗺️ Carte interactive de Chichen Itza */}
+        <div className="w-full max-w-3xl h-[400px] border-2 border-yellow-400 rounded-2xl overflow-hidden shadow-lg">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3732.9615055016937!2d-88.56872518493556!3d20.6842859865054!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8f5675a52f0f80b5%3A0x8ad7b2e7a0a3b6cb!2sChichen%20Itza!5e0!3m2!1sfr!2smx!4v1715340497312!5m2!1sfr!2smx"
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+          ></iframe>
+        </div>
+
+        {!showVideo && (
+          <Button
+            onClick={() => setShowVideo(true)}
+            className="bg-yellow-500 hover:bg-yellow-400 text-black w-full max-w-sm py-3"
+          >
+            Suivant
+          </Button>
+        )}
+
+        {showVideo && (
+          <div className="w-full max-w-3xl aspect-video rounded-xl overflow-hidden border-2 border-yellow-400 shadow-lg">
+            <iframe
+              width="100%"
+              height="100%"
+              src={VIDEO_URL}
+              title="Vidéo Chichen Itza"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
+        )}
+
+        {showVideo && (
+          <Button
+            onClick={() => router.push("/accueil")}
+            size="lg"
+            className="bg-purple-700 hover:bg-purple-600 mt-4"
+          >
+            Retour à l'accueil
+          </Button>
+        )}
       </div>
     )
   }
@@ -204,7 +253,6 @@ export default function EnigmeChichenItzaPage() {
         </div>
       )}
 
-      {/* Bloc de l’énigme avec indice ajouté */}
       {isDialogueFinished && !postPhase && !showQuiz && (
         <div className="absolute bottom-12 w-[90%] max-w-3xl bg-black/60 backdrop-blur-md rounded-xl p-6 border border-yellow-400/30 text-center space-y-4">
           <p className="text-lg mb-2">Entre la combinaison du cadenas :</p>
@@ -216,7 +264,6 @@ export default function EnigmeChichenItzaPage() {
             ))}
           </div>
 
-          {/* 🔍 Indice ajouté ici */}
           <p className="text-sm italic text-gray-300 mb-2">
             (Indice : la somme des 4 chiffres est égale à <span className="text-yellow-400 font-semibold">26</span>.)
           </p>
