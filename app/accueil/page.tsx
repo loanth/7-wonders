@@ -1,18 +1,16 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import SplineScene from "@/components/SplineScene"
-import { useSearchParams, useRouter } from "next/navigation"
 import { WonderCard } from "@/components/wonder-card"
 import { wonders } from "@/lib/wonders"
-import { Sparkles } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
 
 export default function Home() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const wonderId = searchParams.get("id")
+
   const selectedWonder = wonderId
     ? wonders.find((w) => w.id === Number.parseInt(wonderId))
     : null
@@ -23,6 +21,45 @@ export default function Home() {
   const [letters, setLetters] = useState<string[]>([])
   const [isCompleted, setIsCompleted] = useState(false)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
+
+  // 🕒 TIMER PERSISTANT 45 min (en secondes)
+  const [timeLeft, setTimeLeft] = useState(45 * 60)
+
+  useEffect(() => {
+    const storedStartTime = localStorage.getItem("timerStart")
+    let startTime: number
+
+    if (storedStartTime) {
+      startTime = parseInt(storedStartTime)
+    } else {
+      startTime = Date.now()
+      localStorage.setItem("timerStart", startTime.toString())
+    }
+
+    const updateTimer = () => {
+      const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000)
+      const remaining = 45 * 60 - elapsedSeconds // ⏱️ 45 min = 2700s
+
+      if (remaining <= 0) {
+        setTimeLeft(0)
+        localStorage.removeItem("timerStart")
+        router.push("/perdu") // 🚨 Redirection quand le temps est écoulé
+      } else {
+        setTimeLeft(remaining)
+      }
+    }
+
+    updateTimer()
+    const interval = setInterval(updateTimer, 1000)
+    return () => clearInterval(interval)
+  }, [router])
+
+  // format mm:ss
+  const formatTime = (sec: number) => {
+    const m = Math.floor(sec / 60)
+    const s = sec % 60
+    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`
+  }
 
   // 🔄 Fetch de la partie associée à l'utilisateur
   useEffect(() => {
@@ -46,11 +83,17 @@ export default function Home() {
 
   // 🔐 Détermination des wonders bloquées / complétées
   const lockedWonders = partieData
-    ? wonders.filter((w) => partieData[`m${w.id}`] === 0)
+    ? wonders.filter((w) => {
+        const key = `m${w.id}`
+        return partieData[key] === 0
+      })
     : []
 
   const completedWonders = partieData
-    ? wonders.filter((w) => partieData[`m${w.id}`] === 1)
+    ? wonders.filter((w) => {
+        const key = `m${w.id}`
+        return partieData[key] === 1
+      })
     : []
 
   // ✅ Vérifie si toutes les merveilles sont complètes
@@ -151,11 +194,16 @@ export default function Home() {
   // 🌍 Page principale classique
   return (
     <main className="min-h-screen w-full bg-black text-white overflow-y-auto relative">
+      {/* 🌈 Fonds animés */}
       <div className="fixed inset-0 bg-gradient-to-br from-purple-900/20 via-black to-pink-900/20 pointer-events-none" />
       <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-900/30 via-transparent to-transparent pointer-events-none" />
 
+      {/* ⏱️ TIMER FIXÉ EN HAUT */}
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-zinc-900/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg shadow-purple-900/30 font-mono text-lg">
+        ⏱️ {formatTime(timeLeft)}
+      </div>
+
       <section className="relative h-[75vh] flex">
-        {/* 3D Model */}
         <div className="w-full h-full relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent z-10 pointer-events-none" />
           <div className="absolute inset-0 bg-purple-500/5 group-hover:bg-purple-500/10 transition-colors duration-500 pointer-events-none z-10" />
@@ -185,11 +233,18 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {lockedWonders.map((wonder, index) => (
-                <div key={wonder.id} className="animate-fadeInUp" style={{ animationDelay: `${index * 0.1}s` }}>
+                <div
+                  key={wonder.id}
+                  className="animate-fadeInUp"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
                   <WonderCard
                     wonder={{
                       ...wonder,
-                      status: partieData[`m${wonder.id}`] === 1 ? "completed" : "locked",
+                      status:
+                        partieData[`m${wonder.id}`] === 1
+                          ? "completed"
+                          : "locked",
                     }}
                   />
                 </div>
@@ -221,11 +276,18 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {completedWonders.map((wonder, index) => (
-                <div key={wonder.id} className="animate-fadeInUp" style={{ animationDelay: `${index * 0.1}s` }}>
+                <div
+                  key={wonder.id}
+                  className="animate-fadeInUp"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
                   <WonderCard
                     wonder={{
                       ...wonder,
-                      status: partieData[`m${wonder.id}`] === 1 ? "completed" : "locked",
+                      status:
+                        partieData[`m${wonder.id}`] === 1
+                          ? "completed"
+                          : "locked",
                     }}
                   />
                 </div>
