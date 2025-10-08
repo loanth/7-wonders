@@ -8,6 +8,7 @@ import dynamic from "next/dynamic"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import Image from "next/image"
+import { cn } from "@/lib/utils"
 
 const SplineBg = dynamic(() => import("@/components/SplineScene"), { ssr: false, loading: () => <div className="w-full h-full" /> })
 
@@ -48,31 +49,33 @@ export default function AccueilIntro() {
 	}
 
 	return (
-		<div className="relative min-h-screen flex items-center justify-center bg-background overflow-hidden">
+		<div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/80 via-background to-secondary/80 overflow-hidden">
 			{/* Fond animé */}
 			<div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-				<div className="w-[500px] h-[500px] md:w-[700px] md:h-[700px] opacity-60">
+				<div className="w-[500px] h-[500px] md:w-[700px] md:h-[700px] opacity-70 blur-sm">
 					<SplineBg />
 				</div>
 			</div>
 			{/* Card centrale avec dialogue */}
-			<Card className="relative z-10 w-full max-w-lg mx-auto bg-card/90 shadow-2xl border border-border p-8 flex flex-col items-center">
-				<div className="flex items-center mb-6">
+			<Card className={cn("relative z-10 w-full max-w-xl mx-auto bg-card/95 shadow-2xl border border-border p-10 flex flex-col items-center backdrop-blur-md transition-all duration-300", "rounded-3xl")}>
+				<div className="flex items-center mb-8">
 					<Image
 						src={current.avatar}
 						alt={current.speaker}
-						width={64}
-						height={64}
-						className="rounded-full border-2 border-primary mr-4"
+						width={72}
+						height={72}
+						className="rounded-full border-4 border-primary/80 shadow-lg mr-6 bg-background"
 					/>
-					<span className="font-bold text-lg text-primary">{current.speaker}</span>
+					<span className="font-extrabold text-2xl text-primary drop-shadow-sm tracking-wide">
+						{current.speaker}
+					</span>
 				</div>
-				<div className="bg-muted/40 rounded-lg p-4 text-base text-foreground mb-8 whitespace-pre-line min-h-[80px]">
+				<div className="bg-muted/60 rounded-xl p-6 text-lg text-foreground mb-10 whitespace-pre-line min-h-[90px] shadow-inner border border-muted-foreground/10">
 					{current.text}
 				</div>
 				<Button
 					size="lg"
-					className="text-lg px-8 py-4 font-bold"
+					className="text-lg px-10 py-4 font-bold rounded-xl bg-gradient-to-r from-primary to-secondary text-white shadow-lg hover:scale-105 transition-transform"
 					onClick={handleNext}
 				>
 					{step < dialogue.length - 1 ? "Suivant" : "Explorer la planète"}
