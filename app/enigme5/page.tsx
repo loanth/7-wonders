@@ -7,7 +7,7 @@ import { useTimer } from "@/context/TimerContext"
 
 export default function EnigmeChichenItzaPage() {
   const router = useRouter()
-   const { timeLeft, formatTime } = useTimer()
+  const { timeLeft, formatTime } = useTimer()
   const [dialogueIndex, setDialogueIndex] = useState(0)
   const [isDialogueFinished, setIsDialogueFinished] = useState(false)
   const [answer, setAnswer] = useState("")
@@ -20,6 +20,7 @@ export default function EnigmeChichenItzaPage() {
   const [postPhase, setPostPhase] = useState(false)
   const [postDialogueIndex, setPostDialogueIndex] = useState(0)
   const [showVideo, setShowVideo] = useState(false)
+  const [lives, setLives] = useState(3) // 3 vies au départ
 
   const VIDEO_URL = "https://www.youtube.com/embed/ZxBuScr7hrk?si=ZDOJrVSkC87KVPCd"
 
@@ -33,10 +34,6 @@ export default function EnigmeChichenItzaPage() {
   ]
 
   const correctAnswer = "4769"
-  const symbols = [
-    { id: 1, image: "https://i.imgur.com/TU2Bv0x.png", description: "Symbole de faible valeur" },
-    { id: 2, image: "https://i.imgur.com/6S1v7xO.png", description: "Symbole de plus grande valeur" },
-  ]
 
   const codedNumbers = [
     { maya: "••••" },
@@ -93,6 +90,7 @@ export default function EnigmeChichenItzaPage() {
     },
   ]
 
+  // --- Dialogues initiaux ---
   useEffect(() => {
     const handleNext = (e: KeyboardEvent | MouseEvent) => {
       if (isDialogueFinished) return
@@ -114,9 +112,18 @@ export default function EnigmeChichenItzaPage() {
     }
   }, [isDialogueFinished, dialogues.length])
 
-  const handleValidate = async () => {
+  // --- Validation du cadenas ---
+  const handleValidate = () => {
     if (answer.trim() !== correctAnswer) {
-      alert("Ce n’est pas la bonne combinaison… observe bien les symboles et réfléchis à leur valeur relative.")
+      setLives((prev) => {
+        if (prev <= 1) {
+          alert("Tu as épuisé toutes tes vies ! Tu vas être redirigé vers l'accueil.")
+          router.push("/accueil")
+          return 0
+        }
+        return prev - 1
+      })
+      alert(`Mauvaise combinaison ! Vies restantes : ${lives - 1}`)
       return
     }
     setIsDialogueFinished(false)
@@ -126,6 +133,7 @@ export default function EnigmeChichenItzaPage() {
     setPostPhase(true)
   }
 
+  // --- Dialogues après réponse ---
   useEffect(() => {
     if (!postPhase) return
     const handleNextPost = (e: KeyboardEvent | MouseEvent) => {
@@ -148,16 +156,29 @@ export default function EnigmeChichenItzaPage() {
     }
   }, [postPhase])
 
+  // --- Réponses du quiz ---
   const handleAnswerQuiz = (option: string) => {
     const current = quiz[quizIndex]
     const isCorrect = option === current.correct
-    setFeedback(isCorrect ? "✅ Bonne réponse !" : "❌ Mauvaise réponse...")
-    if (isCorrect) setScore((prev) => prev + 1)
-    setTimeout(() => {
-      setFeedback(null)
-      if (quizIndex < quiz.length - 1) setQuizIndex((prev) => prev + 1)
-      else finishQuiz()
-    }, 1500)
+
+    if (isCorrect) {
+      setFeedback("✅ Bonne réponse !")
+      setScore((prev) => prev + 1)
+      setTimeout(() => {
+        setFeedback(null)
+        if (quizIndex < quiz.length - 1) setQuizIndex((prev) => prev + 1)
+        else finishQuiz()
+      }, 1500)
+    } else {
+      setLives((prev) => {
+        if (prev <= 1) {
+          router.push("/accueil")
+          return 0
+        }
+        return prev - 1
+      })
+      setFeedback(`❌ Mauvaise réponse !`)
+    }
   }
 
   const finishQuiz = async () => {
@@ -178,6 +199,14 @@ export default function EnigmeChichenItzaPage() {
     }
   }
 
+  // --- Affichage vies ---
+  const LivesDisplay = () => (
+    <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-red-500/40 text-red-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
+      ❤️ Vies : {lives}
+    </div>
+  )
+
+  // --- Rendu final ---
   if (showCongrats) {
     return (
       <div
@@ -187,17 +216,18 @@ export default function EnigmeChichenItzaPage() {
             "url('https://upload.wikimedia.org/wikipedia/commons/8/8d/El_Castillo_Stitch_2008_Edit_1.jpg')",
         }}
       >
-        {/* Timer */}
-      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
-        ⏱️ {formatTime(timeLeft)}
-      </div>
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
+          ⏱️ {formatTime(timeLeft)}
+        </div>
+
+        <LivesDisplay />
+
         <h1 className="text-4xl font-bold">🎉 Félicitations ! 🎉</h1>
         <p className="text-xl">
           Tu as percé le mystère de Chichen Itza et remporté le quiz maya !<br />
           Tu gagnes la lettre <span className="text-yellow-300 font-bold text-2xl">C</span>.
         </p>
 
-        {/* 🗺️ Carte interactive de Chichen Itza */}
         <div className="w-full max-w-3xl h-[400px] border-2 border-yellow-400 rounded-2xl overflow-hidden shadow-lg">
           <iframe
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3732.9615055016937!2d-88.56872518493556!3d20.6842859865054!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8f5675a52f0f80b5%3A0x8ad7b2e7a0a3b6cb!2sChichen%20Itza!5e0!3m2!1sfr!2smx!4v1715340497312!5m2!1sfr!2smx"
@@ -254,7 +284,7 @@ export default function EnigmeChichenItzaPage() {
     >
       {/* Timer */}
       <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
-        ⏱️ {formatTime(timeLeft)}
+        ⏱️ {formatTime(timeLeft)} | ❤️ {lives}
       </div>
       {!isDialogueFinished && !postPhase && !showQuiz && (
         <div className="absolute bottom-8 w-[90%] max-w-4xl bg-black/50 backdrop-blur-sm rounded-xl p-6 border border-yellow-300/20 text-lg text-center">
@@ -311,7 +341,7 @@ export default function EnigmeChichenItzaPage() {
               <Button
                 key={i}
                 onClick={() => handleAnswerQuiz(option)}
-                disabled={!!feedback}
+                
                 className="bg-amber-700 hover:bg-amber-600 text-lg py-4"
               >
                 {option}

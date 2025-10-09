@@ -24,6 +24,7 @@ export default function Enigme3Page() {
   const [quizCompleted, setQuizCompleted] = useState(false)
   const [enigmeDone, setEnigmeDone] = useState(false)
    const { timeLeft, formatTime } = useTimer()
+    const [lives, setLives] = useState(3) // 💜 Ajout des vies
 
   const dialogues = [
     "Namasté ! Bienvenue devant le majestueux Taj Mahal.",
@@ -135,6 +136,13 @@ export default function Enigme3Page() {
       }
     } else {
       setQuizFeedback("❌ Mauvaise réponse !❌")
+       setLives(prev => {
+        const nextLives = prev - 1
+        if (nextLives <= 0){
+          alert("Tu as perdu toutes tes vies ! Retour à l'accueil...")
+           router.push("/accueil")}
+        return nextLives
+      })
     }
   }
 
@@ -169,7 +177,7 @@ export default function Enigme3Page() {
         >
           {/* Timer */}
             <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
-              ⏱️ {formatTime(timeLeft)}
+              ⏱️ {formatTime(timeLeft)} ❤️ {lives}
             </div>
           <Image
             src="/ImageEnigme3/image-indien.png"
@@ -192,7 +200,7 @@ export default function Enigme3Page() {
         <div className="relative z-20 flex justify-center items-center min-h-screen px-4 md:px-8">
           {/* Timer */}
             <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
-              ⏱️ {formatTime(timeLeft)}
+              ⏱️ {formatTime(timeLeft)} ❤️ {lives}
             </div>
           <Card className="bg-white/80 backdrop-blur-md text-gray-800 shadow-2xl max-w-3xl w-full border border-purple-200">
             <CardHeader>
@@ -273,7 +281,7 @@ export default function Enigme3Page() {
         <div className="absolute bottom-6 left-6 flex items-end space-x-4 z-40">
           {/* Timer */}
             <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
-              ⏱️ {formatTime(timeLeft)}
+              ⏱️ {formatTime(timeLeft)} ❤️ {lives}
             </div>
           <Image
             src="/ImageEnigme3/image-indien.png"
@@ -303,7 +311,7 @@ export default function Enigme3Page() {
         <div className="relative z-20 flex justify-center items-center min-h-screen px-4 md:px-8">
           {/* Timer */}
             <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
-              ⏱️ {formatTime(timeLeft)}
+              ⏱️ {formatTime(timeLeft)} ❤️ {lives}
             </div>
           <Card className="bg-white/90 text-gray-800 shadow-2xl max-w-3xl w-full border border-purple-200">
             <CardHeader>
@@ -341,7 +349,7 @@ export default function Enigme3Page() {
         <div className="relative z-20 flex flex-col justify-center items-center min-h-screen px-4 md:px-8 text-center gap-8">
           {/* Timer */}
             <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
-              ⏱️ {formatTime(timeLeft)}
+              ⏱️ {formatTime(timeLeft)} 
             </div>
           <p className="text-2xl font-bold text-yellow-400">
             🎉 Félicitations ! Vous avez terminé le quiz ! 🎉

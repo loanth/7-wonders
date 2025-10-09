@@ -37,6 +37,16 @@ export default function EnigmeRioPage() {
   const [showMap, setShowMap] = useState(false)
   const [showImages, setShowImages] = useState(false)
 
+  // ❤️ Système de vies
+  const [lives, setLives] = useState(3)
+
+  useEffect(() => {
+    if (lives <= 0) {
+      alert("Tu as épuisé toutes tes vies ! Tu vas être redirigé vers l'accueil.")
+      router.push("/accueil")
+    }
+  }, [lives, router])
+
   // 💬 Dialogues d’intro
   const dialogues = [
     "Salut, voyageur ! Bienvenue à Rio de Janeiro 🌴",
@@ -141,21 +151,26 @@ export default function EnigmeRioPage() {
     }
   }, [postPhase])
 
-  // 🎯 Réponses du quiz
+  // 🎯 Réponses du quiz avec vies et blocage jusqu’à bonne réponse
   const handleAnswerQuiz = (option: string) => {
     const current = quiz[quizIndex]
     const isCorrect = option === current.correct
-    setFeedback(isCorrect ? "✅ Bonne réponse !" : `❌ Raté ! Réponse : ${current.correct}`)
-    if (isCorrect) setScore((s) => s + 1)
+    setFeedback(isCorrect ? "✅ Bonne réponse !" : `❌ Mauvaise réponse !`)
 
-    setTimeout(() => {
-      setFeedback(null)
-      if (quizIndex < quiz.length - 1) setQuizIndex((q) => q + 1)
-      else {
-        setShowQuiz(false)
-        setShowVideo(true)
-      }
-    }, 1500)
+    if (isCorrect) {
+      setScore((s) => s + 1)
+      setTimeout(() => {
+        setFeedback(null)
+        if (quizIndex < quiz.length - 1) setQuizIndex((q) => q + 1)
+        else {
+          setShowQuiz(false)
+          setShowVideo(true)
+        }
+      }, 1000)
+    } else {
+      setLives((prev) => prev - 1)
+      setTimeout(() => setFeedback(null), 1200)
+    }
   }
 
   // 🎬 Fin du flow : vidéo → map → félicitations
@@ -190,10 +205,9 @@ export default function EnigmeRioPage() {
         <img src="/img7/adorable-samba-queens-in-rio-carnival-parade-clipart-free-png.webp" alt="Zeca" className="w-48 h-48 mb-4" />
         <h1 className="text-4xl font-bold mb-4">Bravo, explorateur du carnaval ! 🎉</h1>
         <p className="text-xl mb-6">
-          Tu as percé les mystères de Rio et répondu à toutes les questions !  
-          <br />Score : {score} / {quiz.length}
+          Score : {score} / {quiz.length}
           <br />
-          La lettre mystique t’est révélée : <span className="text-yellow-300 font-bold text-2xl">LI</span>
+          La lettre mystique t’est révélée : <span className="text-yellow-300 font-bold text-2xl">L</span>
         </p>
         <Button onClick={() => router.push("/accueil")} size="lg">Retour à l’accueil</Button>
       </div>
@@ -206,8 +220,8 @@ export default function EnigmeRioPage() {
       style={{ backgroundImage: "url('/img7/pexels-4fly-rj-1461715-2818895.jpg')" }}
     >
       {/* ⏱ Timer */}
-      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-zinc-900/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
-        ⏱️ {formatTime(timeLeft)}
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-zinc-900/70 border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full font-mono text-lg">
+        ⏱️ {formatTime(timeLeft)} | ❤️ {lives}
       </div>
 
       {/* Jeu des 7 différences */}
@@ -227,9 +241,9 @@ export default function EnigmeRioPage() {
         </div>
       )}
 
-      {/* Compteur différences */}
+      {/* Différences compteur */}
       {isDialogueFinished && !postPhase && !showQuiz && !showVideo && !showMap && (
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-black/60 px-6 py-3 rounded-full text-lg z-20">
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-black/60 px-6 py-3 rounded-full text-lg">
           Différences trouvées : {foundDiffs.length} / {differences.length}
         </div>
       )}
@@ -238,26 +252,26 @@ export default function EnigmeRioPage() {
       <img
         src="/img7/adorable-samba-queens-in-rio-carnival-parade-clipart-free-png.webp"
         alt="Zeca"
-        className="absolute bottom-0 right-0 h-90 select-none pointer-events-none z-20"
+        className="absolute bottom-0 right-0 h-90 select-none pointer-events-none"
       />
 
-      {/* Bulle dialogues / quiz / vidéo / map */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-4xl bg-black/60 backdrop-blur-md rounded-xl p-6 text-lg text-center shadow-lg z-20 space-y-4">
-        {!isDialogueFinished && !postPhase && !showQuiz && !showVideo && !showMap ? (
+      {/* Dialogues / quiz / vidéo / map */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-4xl bg-black/60 rounded-xl p-6 text-lg text-center">
+        {!isDialogueFinished && !postPhase && !showQuiz && !showVideo && !showMap && (
           <>
             {dialogues[dialogueIndex]}
             <p className="text-sm text-gray-300 mt-2">(Espace ou clic pour continuer...)</p>
           </>
-        ) : null}
+        )}
 
-        {postPhase && !showQuiz && !showVideo && !showMap && (
+        {postPhase && !showQuiz && (
           <>
             {postDialogues[postDialogueIndex]}
             <p className="text-sm text-gray-300 mt-2">(Espace ou clic pour continuer...)</p>
           </>
         )}
 
-        {showQuiz && !showVideo && !showMap && (
+        {showQuiz && (
           <>
             <h2 className="text-2xl font-bold mb-4">{quiz[quizIndex].question}</h2>
             {quiz[quizIndex].img && <img src={quiz[quizIndex].img} className="w-80 h-48 object-cover rounded-lg mb-4 mx-auto" />}
@@ -273,7 +287,7 @@ export default function EnigmeRioPage() {
           </>
         )}
 
-        {showVideo && !showMap && (
+        {showVideo && (
           <>
             <h2 className="text-2xl font-bold mb-4">Découvre Rio 🎥</h2>
             <iframe
@@ -283,13 +297,13 @@ export default function EnigmeRioPage() {
               title="Rio de Janeiro"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
-              className="rounded-xl shadow-lg"
+              className="rounded-xl"
             ></iframe>
             <Button className="mt-4" onClick={handleVideoNext}>Voir la map</Button>
           </>
         )}
 
-        {showMap && !showVideo && (
+        {showMap && (
           <>
             <h2 className="text-2xl font-bold mb-4">Localisation de Rio 🗺️</h2>
             <iframe
@@ -299,7 +313,7 @@ export default function EnigmeRioPage() {
               style={{ border: 0 }}
               allowFullScreen
               loading="lazy"
-              className="rounded-xl shadow-lg"
+              className="rounded-xl"
             ></iframe>
             <Button className="mt-4" onClick={handleFinish}>Terminer</Button>
           </>
