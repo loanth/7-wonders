@@ -146,6 +146,66 @@ export default function Home() {
     )
   }
 
+// 🎉 Écran final de félicitations
+  if (isCompleted) {
+    return (
+<main className="min-h-screen flex flex-col justify-center items-center bg-black text-white">
+<h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mb-6 text-center">
+          Félicitations !
+</h1>
+<p className="text-lg text-gray-300 mb-10 text-center max-w-md">
+          Tu as retrouvé la <span className="text-purple-400 font-semibold">Clé des Civilisations</span> !
+          Ton voyage à travers les Merveilles touche à sa fin...
+</p>
+<Button
+          onClick={() => router.push("../")}
+          className="bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:scale-105 transition-transform"
+>
+          Retour à la connexion
+</Button>
+</main>
+    )
+  }
+
+
+  
+
+  // 🧩 Challenge final interactif
+  if (showFinalChallenge) {
+    return (
+<main className="min-h-screen flex flex-col justify-center items-center bg-black text-white">
+<h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+          Dernier défi
+</h1>
+<p className="text-gray-300 mb-8 text-center">
+          Réarrange les lettres pour trouver le mot mystère :
+</p>
+ 
+        <div className="flex gap-3 mb-6 text-3xl font-bold tracking-widest flex-wrap justify-center">
+          {letters.map((l, i) => (
+<div
+              key={i}
+              draggable
+              onDragStart={() => handleDragStart(i)}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={() => handleDrop(i)}
+              className="bg-zinc-800 px-5 py-3 rounded-xl border border-purple-500/40 select-none cursor-move hover:bg-purple-700/30 transition-transform duration-150 active:scale-110"
+>
+              {l}
+</div>
+          ))}
+</div>
+ 
+        <Button
+          onClick={checkIfCorrect}
+          className="bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:scale-105 transition-transform"
+>
+          Valider le mot
+</Button>
+</main>
+    )
+  }
+
   // ✅ Tout le rendu normal ci-dessous...
   return (
     <main className="min-h-screen w-full bg-black text-white overflow-y-auto relative">
