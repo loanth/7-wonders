@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, HelpCircle, Lock, Unlock, Sparkles } from "lucide-react"
+import { ArrowLeft, HelpCircle, Sparkles, Home } from "lucide-react"
 import { useTimer } from "@/context/TimerContext"
 
 export default function Enigme1Page() {
@@ -18,7 +18,7 @@ export default function Enigme1Page() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
   const [quizCompleted, setQuizCompleted] = useState(false)
   const { timeLeft, formatTime } = useTimer()
-   const [showYTVideo, setShowYTVideo] = useState(false)
+  const [showYTVideo, setShowYTVideo] = useState(false)
 
   const toggleYTVideo = () => {
     setShowYTVideo(!showYTVideo)
@@ -30,49 +30,49 @@ const questions = [
     question: "Quand la construction de la Grande Muraille a-t-elle commencé ?",
     options: ["IIIe siècle av. J.-C.", "Ier siècle apr. J.-C.", "Ve siècle av. J.-C.", "Xe siècle apr. J.-C."],
     correct: "IIIe siècle av. J.-C.",
-    explanation: "La construction de la Grande Muraille de Chine a débuté au IIIe siècle avant J.-C., sous le règne de Qin Shi Huang, le premier empereur de Chine. Il a ordonné la connexion et la consolidation de plusieurs fortifications régionales pour protéger son empire des invasions des peuples nomades du nord, notamment les Xiongnu. Ce gigantesque projet a marqué le début d’un chantier titanesque qui s’est poursuivi pendant plus de deux millénaires."
+    explanation: "La construction de la Grande Muraille de Chine a débuté au IIIe siècle avant J.-C., sous le règne de Qin Shi Huang, le premier empereur de Chine. Il a ordonné la connexion et la consolidation de plusieurs fortifications régionales pour protéger son empire des invasions des peuples nomades du nord, notamment les Xiongnu. Ce gigantesque projet a marqué le début d'un chantier titanesque qui s'est poursuivi pendant plus de deux millénaires."
   },
   {
     question: "Quelle est la longueur totale de la Grande Muraille ?",
     options: ["5 000 km", "10 000 km", "20 000 km", "30 000 km"],
     correct: "20 000 km",
-    explanation: "La Grande Muraille de Chine s’étend sur plus de 20 000 kilomètres, traversant montagnes, déserts et plaines. Elle relie l’est de la Chine, près de la mer de Bohai, jusqu’aux régions arides de l’ouest. Cette longueur colossale inclut non seulement les murs principaux, mais aussi les tours de guet, les tranchées et les barrages naturels utilisés comme défenses. C’est l’un des plus longs ouvrages jamais construits par l’homme."
+    explanation: "La Grande Muraille de Chine s'étend sur plus de 20 000 kilomètres, traversant montagnes, déserts et plaines. Elle relie l'est de la Chine, près de la mer de Bohai, jusqu'aux régions arides de l'ouest. Cette longueur colossale inclut non seulement les murs principaux, mais aussi les tours de guet, les tranchées et les barrages naturels utilisés comme défenses. C'est l'un des plus longs ouvrages jamais construits par l'homme."
   },
   {
     question: "Quel empereur a unifié les différentes sections de la muraille ?",
     options: ["Qin Shi Huang", "Han Wudi", "Kangxi", "Yongle"],
     correct: "Qin Shi Huang",
-    explanation: "C’est Qin Shi Huang, le premier empereur de la dynastie Qin, qui a entrepris d’unifier les différents tronçons de murailles déjà construits par les royaumes chinois antérieurs. Il a ordonné leur extension et leur renforcement pour créer une ligne de défense continue au nord du pays. Ce même empereur est aussi célèbre pour son armée de terre cuite, symbole de sa puissance et de sa volonté d’immortalité."
+    explanation: "C'est Qin Shi Huang, le premier empereur de la dynastie Qin, qui a entrepris d'unifier les différents tronçons de murailles déjà construits par les royaumes chinois antérieurs. Il a ordonné leur extension et leur renforcement pour créer une ligne de défense continue au nord du pays. Ce même empereur est aussi célèbre pour son armée de terre cuite, symbole de sa puissance et de sa volonté d'immortalité."
   },
   {
     question: "Quel était le principal objectif de la Grande Muraille ?",
     options: ["Commerce", "Protection militaire", "Religion", "Tourisme"],
     correct: "Protection militaire",
-    explanation: "La Grande Muraille fut d’abord conçue comme un rempart défensif contre les invasions des peuples nomades venus du nord, notamment les Mongols et les Xiongnu. Elle servait à retarder les attaques ennemies, à contrôler les déplacements de population et à sécuriser les routes commerciales. Des garnisons étaient installées dans des tours de guet pour signaler toute intrusion grâce à des signaux de fumée ou des feux."
+    explanation: "La Grande Muraille fut d'abord conçue comme un rempart défensif contre les invasions des peuples nomades venus du nord, notamment les Mongols et les Xiongnu. Elle servait à retarder les attaques ennemies, à contrôler les déplacements de population et à sécuriser les routes commerciales. Des garnisons étaient installées dans des tours de guet pour signaler toute intrusion grâce à des signaux de fumée ou des feux."
   },
   {
     question: "Combien de dynasties ont participé à sa construction ?",
     options: ["3 dynasties", "5 dynasties", "7 dynasties", "Plus de 10 dynasties"],
     correct: "Plus de 10 dynasties",
-    explanation: "La construction de la Grande Muraille s’est étalée sur près de deux mille ans, impliquant plus d’une dizaine de dynasties chinoises. Les principales contributions vinrent des dynasties Qin, Han, Sui, Tang, et surtout Ming, qui renforcèrent et perfectionnèrent la structure. Chaque époque ajoutait ses propres sections, tours et techniques, faisant de la muraille un témoignage vivant de l’évolution de la Chine impériale."
+    explanation: "La construction de la Grande Muraille s'est étalée sur près de deux mille ans, impliquant plus d'une dizaine de dynasties chinoises. Les principales contributions vinrent des dynasties Qin, Han, Sui, Tang, et surtout Ming, qui renforcèrent et perfectionnèrent la structure. Chaque époque ajoutait ses propres sections, tours et techniques, faisant de la muraille un témoignage vivant de l'évolution de la Chine impériale."
   },
   {
     question: "De quels matériaux était principalement faite la muraille ?",
     options: ["Bois et bambou", "Pierre et terre", "Bronze et fer", "Marbre et jade"],
     correct: "Pierre et terre",
-    explanation: "Les matériaux utilisés pour la construction de la muraille variaient selon les régions et les ressources locales. Dans les zones montagneuses, on employait de la pierre, tandis que dans les plaines, on utilisait de la terre tassée, des briques, et parfois du bois. Ces matériaux étaient transportés à dos d’homme, de cheval ou même de chameau, rendant la tâche épuisante et souvent mortelle pour les ouvriers."
+    explanation: "Les matériaux utilisés pour la construction de la muraille variaient selon les régions et les ressources locales. Dans les zones montagneuses, on employait de la pierre, tandis que dans les plaines, on utilisait de la terre tassée, des briques, et parfois du bois. Ces matériaux étaient transportés à dos d'homme, de cheval ou même de chameau, rendant la tâche épuisante et souvent mortelle pour les ouvriers."
   },
   {
     question: "Peut-on vraiment voir la muraille depuis l'espace ?",
     options: ["Oui, facilement", "Non, c'est un mythe", "Seulement avec un télescope", "Uniquement la nuit"],
     correct: "Non, c'est un mythe",
-    explanation: "Contrairement à la croyance populaire, la Grande Muraille de Chine n’est pas visible à l’œil nu depuis l’espace. Les astronautes ont confirmé que, bien qu’elle soit immense, sa largeur et sa couleur se confondent avec le paysage environnant. Ce mythe, apparu au XXe siècle, symbolise toutefois la grandeur de cette construction et son impact culturel à l’échelle mondiale."
+    explanation: "Contrairement à la croyance populaire, la Grande Muraille de Chine n'est pas visible à l'œil nu depuis l'espace. Les astronautes ont confirmé que, bien qu'elle soit immense, sa largeur et sa couleur se confondent avec le paysage environnant. Ce mythe, apparu au XXe siècle, symbolise toutefois la grandeur de cette construction et son impact culturel à l'échelle mondiale."
   },
   {
     question: "Combien d'ouvriers ont travaillé sur la Grande Muraille ?",
     options: ["Des milliers", "Des centaines de milliers", "Des millions", "Des dizaines de millions"],
     correct: "Des millions",
-    explanation: "On estime que plusieurs millions d’ouvriers, soldats, paysans et prisonniers ont participé à la construction de la Grande Muraille à travers les âges. Beaucoup y ont laissé leur vie à cause des conditions extrêmes, du froid, de la faim et des accidents. Certaines légendes racontent que les ossements des travailleurs auraient même été intégrés dans les fondations de certaines sections du mur."
+    explanation: "On estime que plusieurs millions d'ouvriers, soldats, paysans et prisonniers ont participé à la construction de la Grande Muraille à travers les âges. Beaucoup y ont laissé leur vie à cause des conditions extrêmes, du froid, de la faim et des accidents. Certaines légendes racontent que les ossements des travailleurs auraient même été intégrés dans les fondations de certaines sections du mur."
   },
   {
   question: "Qui est considéré comme le plus grand des gardiens de la Grande Muraille de Chine ?",
@@ -110,25 +110,15 @@ const questions = [
     }
     setLoading(true)
     try {
-      const response = await fetch("/api/enigme/validate", {
+      await fetch("/api/enigme/validate", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          partieId: Number.parseInt(partieId),
-          enigmeId: 1,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ partieId: Number.parseInt(partieId), enigmeId: 4 })
       })
-      const data = await response.json()
-      if (response.ok) {
-        router.push("/accueil")
-      } else {
-        alert(data.error || "Erreur lors de la validation")
-      }
+      router.push("/accueil")
     } catch (error) {
-      console.error("Erreur:", error)
-      alert("Erreur de connexion au serveur")
+      console.error(error)
+      alert("Erreur lors de la validation")
     } finally {
       setLoading(false)
     }
@@ -140,9 +130,11 @@ const solution = [
   ['和','长','勇','龙','守','坚','力','忠','智'],
   ['力','守','坚','智','长','忠','勇','和','龙'],
   ['忠','智','龙','和','力','勇','坚','守','长'],
-  ['长','坚','守','忠','勇','力','坚','龙','长'],
+
+  ['长','坚','守','忠','勇','力','智','龙','和'],
   ['智','和','力','长','龙','守','忠','勇','坚'],
   ['龙','勇','忠','坚','智','和','长','力','守'],
+
   ['勇','龙','长','守','忠','智','和','坚','力'],
   ['守','力','和','勇','坚','长','龙','智','忠'],
   ['坚','忠','智','力','和','龙','守','长','勇']
@@ -150,15 +142,15 @@ const solution = [
 
 // Grille initiale corrigée et résoluble
 const initialGrid = [
-  ['','长','','','守','坚','','忠',''],
+  ['','长','勇','','守','坚','','忠','智'],
   ['力','','坚','智','长','忠','勇','和','龙'],
-  ['忠','智','龙','','力','','','',''],
-  ['长','坚','','','勇','','','',''],
-  ['','和','力','长','龙','守','忠','勇','坚'],
+  ['忠','智','龙','','力','','坚','','长'],
+  ['长','坚','','忠','勇','力','','龙',''],
+  ['智','和','力','长','龙','守','忠','勇','坚'],
   ['','勇','忠','','','和','长','力','守'],
-  ['勇','','长','','忠','','','坚',''],
-  ['守','力','','','坚','长','龙','智','忠'],
-  ['坚','','智','力','','龙','守','长','']
+  ['勇','','长','守','忠','','','坚',''],
+  ['守','力','和','','坚','长','龙','智','忠'],
+  ['坚','','智','力','','龙','守','长','勇']
 ];
 
 // Ensemble des chiffres utilisés
@@ -302,19 +294,19 @@ const characterNames = {
               </h3>
               <p className="text-gray-800 text-sm leading-relaxed">
                 La Grande Muraille de Chine, dont la construction a commencé au 
-                <strong> IIIᵉ siècle av. J.-C. sous l’empereur Qin Shi Huang</strong>, 
-                est l’un des monuments les plus impressionnants de l’histoire humaine. 
+                <strong> IIIᵉ siècle av. J.-C. sous l'empereur Qin Shi Huang</strong>, 
+                est l'un des monuments les plus impressionnants de l'histoire humaine. 
                 Érigée pour assurer la <strong>protection militaire</strong> du pays contre les invasions du nord, 
-                elle s’étend aujourd’hui sur plus de <strong>20 000 kilomètres</strong> à travers montagnes, déserts et plaines. 
-                Sa construction, qui s’est poursuivie pendant plus de <strong>2000 ans</strong>, 
-                a mobilisé des <strong>millions d’ouvriers</strong> sous plus d’une dizaine de dynasties, 
-                chacune ajoutant sa pierre à l’édifice.
+                elle s'étend aujourd'hui sur plus de <strong>20 000 kilomètres</strong> à travers montagnes, déserts et plaines. 
+                Sa construction, qui s'est poursuivie pendant plus de <strong>2000 ans</strong>, 
+                a mobilisé des <strong>millions d'ouvriers</strong> sous plus d'une dizaine de dynasties, 
+                chacune ajoutant sa pierre à l'édifice.
               </p>
               <p className="text-gray-800 text-sm leading-relaxed mt-3">
                 Principalement bâtie avec de la <strong>pierre, de la terre et des briques</strong>, 
-                la muraille s’adapte aux paysages qu’elle traverse. 
-                Contrairement à la légende populaire, elle <strong>n’est pas visible depuis l’espace</strong> à l’œil nu, 
-                bien qu’elle demeure un symbole de la grandeur et de la persévérance chinoise.
+                la muraille s'adapte aux paysages qu'elle traverse. 
+                Contrairement à la légende populaire, elle <strong>n'est pas visible depuis l'espace</strong> à l'œil nu, 
+                bien qu'elle demeure un symbole de la grandeur et de la persévérance chinoise.
               </p>
               <p className="text-gray-800 text-sm leading-relaxed mt-3">
                 la Grande Muraille incarne à la fois la puissance, la culture et la mémoire du peuple chinois.
@@ -521,7 +513,7 @@ const characterNames = {
                     Dans ce Sudoku des Gardiens Sacrés, chaque <strong>ligne</strong>, chaque <strong>colonne</strong> et chaque <strong>carré 3×3</strong> doit contenir les 9 <strong>valeurs, idées et forces liées à la Grande Muraille</strong> exactement une fois, sans répétition.
                   </p>
                   <p className="text-sm text-red-800 mb-2">
-                    Chaque valeur représente une force mystique et veille sur la muraille. Réparties correctement, elles protègent la section sacrée et maintiennent l’harmonie du royaume.
+                    Chaque valeur représente une force mystique et veille sur la muraille. Réparties correctement, elles protègent la section sacrée et maintiennent l'harmonie du royaume.
                   </p>
                   <p className="text-sm text-red-800">
                     Prenez votre temps, observez bien chaque case et utilisez votre logique pour positionner les gardiens sans enfreindre les règles. 🏯
@@ -582,7 +574,7 @@ const characterNames = {
                 </div>
 
                 {/* Sélection des caractères améliorée */}
-                {selectedCell && (
+                {selectedCell && !isComplete && (
                   <div className="mb-6 p-4 bg-gradient-to-r from-blue-100 to-cyan-100 border-4 border-blue-600 rounded-xl shadow-lg animate-in slide-in-from-bottom duration-300">
                     <h3 className="text-lg font-bold text-blue-900 mb-4 text-center">
                       ✨ Choisissez un gardien ✨
@@ -612,46 +604,46 @@ const characterNames = {
 
                 {/* Message de victoire spectaculaire */}
                 {isComplete && (
-                  <div className="mb-6 p-6 bg-gradient-to-r from-green-400 via-emerald-500 to-green-400 rounded-xl shadow-2xl animate-in zoom-in duration-500">
-                    <div className="flex flex-col items-center justify-center gap-4">
-                      <div className="flex items-center gap-3">
-                        <Unlock className="w-10 h-10 text-white animate-bounce" />
-                        <h2 className="text-2xl md:text-3xl font-bold text-white text-center">
-                          🎉 PASSAGE DÉVERROUILLÉ ! 🎉
-                        </h2>
-                        <Unlock className="w-10 h-10 text-white animate-bounce" />
-                      </div>
-                      <p className="text-white text-lg font-semibold">
-                        Le secret de la Muraille est révélé !
+                  <div className="mb-6 p-8 bg-gradient-to-r from-green-400 via-emerald-500 to-green-400 rounded-2xl shadow-2xl animate-in zoom-in duration-500 border-4 border-yellow-400">
+                    <div className="flex flex-col items-center justify-center gap-6">
+                      <div className="text-7xl animate-bounce">🎉</div>
+                      <h2 className="text-3xl md:text-4xl font-bold text-white text-center">
+                        ÉNIGME RÉSOLUE !
+                      </h2>
+                      <p className="text-white text-xl font-semibold text-center">
+                        Le secret de la Grande Muraille est révélé !
+                        <br />
+                       Voici ta lettre mystère :
                       </p>
+                      <div className="text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-yellow-300">
+                    R
+                  </div>
+                      <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                        <Button
+                          onClick={handleValidate}
+                          disabled={loading}
+                          className="px-8 py-6 text-lg bg-gradient-to-r from-yellow-500 via-orange-500 to-yellow-500 hover:from-yellow-400 hover:via-orange-400 hover:to-yellow-400 text-white font-bold rounded-xl shadow-lg shadow-yellow-500/50 transition-all duration-300 hover:scale-105 border-2 border-yellow-300"
+                        >
+                          <Home className="mr-2 h-6 w-6" />
+                          {loading ? "Validation..." : "Retour à l'accueil"}
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 )}
 
-                {/* Contrôles et statut */}
-                <div className="flex flex-col md:flex-row items-center justify-center gap-4">
-                  <button
-                    onClick={resetGrid}
-                    className="px-8 py-4 bg-gradient-to-r from-red-800 to-red-900 hover:from-red-700 hover:to-red-800 text-white font-bold rounded-xl 
-                             shadow-lg transition-all hover:scale-105 border-2 border-red-600"
-                  >
-                    🔄 Recommencer
-                  </button>
-
-                  <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-amber-200 to-yellow-200 rounded-full shadow-lg border-2 border-yellow-600">
-                    {isComplete ? (
-                      <>
-                        <Unlock className="w-6 h-6 text-green-600 animate-pulse" />
-                        <span className="text-green-800 font-bold text-lg">Déverrouillé</span>
-                      </>
-                    ) : (
-                      <>
-                        <Lock className="w-6 h-6 text-red-600" />
-                        <span className="text-red-800 font-bold text-lg">Verrouillé</span>
-                      </>
-                    )}
+                {/* Contrôles */}
+                {!isComplete && (
+                  <div className="flex justify-center">
+                    <button
+                      onClick={resetGrid}
+                      className="px-8 py-4 bg-gradient-to-r from-red-800 to-red-900 hover:from-red-700 hover:to-red-800 text-white font-bold rounded-xl 
+                               shadow-lg transition-all hover:scale-105 border-2 border-red-600"
+                    >
+                      🔄 Recommencer
+                    </button>
                   </div>
-                </div>
+                )}
 
                 {/* Footer décoratif */}
                 <div className="mt-6 text-center">
