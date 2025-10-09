@@ -1,6 +1,5 @@
 ﻿import { NextResponse, type NextRequest } from "next/server"
-import pool from "@/lib/db"
-import type { ResultSetHeader, RowDataPacket } from "mysql2"
+import pool from "@/lib/db" // ta connexion PostgreSQL (pg.Pool)
 
 // POST /api/partie/[id]/join
 // Permet à un utilisateur (pseudo) de rejoindre une partie publique non terminée
@@ -16,64 +15,72 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       return NextResponse.json({ error: "Pseudo requis" }, { status: 400 })
     }
 
-    const connection = await pool.getConnection()
+    const client = await pool.connect()
     try {
-      await connection.beginTransaction()
+      await client.query("BEGIN")
 
       // Vérifier l'état de la partie
-      const [partieRows] = await connection.query<RowDataPacket[]>(
-        "SELECT public, m1, m2, m3, m4, m5, m6, m7 FROM workshop_partie WHERE id = ?",
+      const partieRes = await client.query(
+        `SELECT public, m1, m2, m3, m4, m5, m6, m7 
+         FROM workshop_partie 
+         WHERE id = $1`,
         [partieId]
       )
-      if (partieRows.length === 0) {
-        await connection.rollback()
+
+      if (partieRes.rows.length === 0) {
+        await client.query("ROLLBACK")
         return NextResponse.json({ error: "Partie non trouvée" }, { status: 404 })
       }
-      const partie = partieRows[0]
-      const finished = [partie.m1, partie.m2, partie.m3, partie.m4, partie.m5, partie.m6, partie.m7].every((v: any) => !!v)
+
+      const partie = partieRes.rows[0]
+      const finished = [partie.m1, partie.m2, partie.m3, partie.m4, partie.m5, partie.m6, partie.m7].every((v) => !!v)
+
       if (!partie.public) {
-        await connection.rollback()
+        await client.query("ROLLBACK")
         return NextResponse.json({ error: "Cette partie n'est pas publique" }, { status: 400 })
       }
+
       if (finished) {
-        await connection.rollback()
+        await client.query("ROLLBACK")
         return NextResponse.json({ error: "Cette partie est déjà terminée" }, { status: 400 })
       }
 
       // Trouver ou créer l'utilisateur
       let userId: number
-      const [users] = await connection.query<RowDataPacket[]>(
-        "SELECT id FROM workshop_user WHERE pseudo = ?",
-        [pseudo]
-      )
-      if (users.length > 0) {
-        userId = users[0].id
+      const userRes = await client.query(`SELECT id FROM workshop_user WHERE pseudo = $1`, [pseudo])
+
+      if (userRes.rows.length > 0) {
+        userId = userRes.rows[0].id
       } else {
-        const [userRes] = await connection.query<ResultSetHeader>(
-          "INSERT INTO workshop_user (pseudo) VALUES (?)",
+        const insertUser = await client.query(
+          `INSERT INTO workshop_user (pseudo) VALUES ($1) RETURNING id`,
           [pseudo]
         )
-        userId = userRes.insertId
+        userId = insertUser.rows[0].id
       }
 
       // Lier l'utilisateur à la partie (idempotent)
-      await connection.query(
-        "INSERT INTO workshop_user_partie (user_id, partie_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE partie_id = VALUES(partie_id)",
+      // => nécessite une contrainte unique (user_id, partie_id)
+      await client.query(
+        `INSERT INTO workshop_user_partie (user_id, partie_id)
+         VALUES ($1, $2)
+         ON CONFLICT (user_id, partie_id)
+         DO UPDATE SET partie_id = EXCLUDED.partie_id`,
         [userId, partieId]
       )
 
-      await connection.commit()
+      await client.query("COMMIT")
+
       return NextResponse.json({ success: true, userId, partieId })
     } catch (e) {
-      await connection.rollback()
+      await client.query("ROLLBACK")
       console.error("Erreur lors de la jointure à la partie:", e)
       return NextResponse.json({ error: "Erreur serveur" }, { status: 500 })
     } finally {
-      connection.release()
+      client.release()
     }
   } catch (error) {
     console.error("Payload invalide ou erreur serveur:", error)
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 })
   }
 }
-
