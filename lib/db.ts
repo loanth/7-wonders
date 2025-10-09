@@ -1,15 +1,16 @@
-import mysql from "mysql2/promise"
+import pkg from "pg";
+const { Pool } = pkg;
 
 // Configuration de la connexion à la base de données
-// Vous devez définir ces variables d'environnement dans votre projet Vercel
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || "sql7.freesqldatabase.com",
-  user: process.env.DB_USER || "sql7801927",
-  password: process.env.DB_PASSWORD || "fYJkntyhEi",
-  database: process.env.DB_NAME || "sql7801927",
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-})
+// (tu peux garder les mêmes variables d’environnement)
+const pool = new Pool({
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "postgres",
+  password: process.env.DB_PASSWORD || "postgres",
+  database: process.env.DB_NAME || "workshop1",
+  port: process.env.DB_PORT || 5432,
+  max: 10, // équivaut à connectionLimit
+  idleTimeoutMillis: 0,
+});
 
-export default pool
+export default pool;
