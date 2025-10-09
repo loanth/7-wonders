@@ -184,12 +184,39 @@ export default function Enigme5Page() {
   }
 
   const handleValidate = async () => {
-    setLoading(true)
-    setTimeout(() => {
-      alert("Bravo ! Énigme validée. Retour à l'accueil...")
-      setLoading(false)
-    }, 1000)
+  const partieId = localStorage.getItem("partieId")
+  if (!partieId) {
+    alert("Aucune partie en cours trouvée.")
+    return
   }
+
+  setLoading(true)
+  try {
+    // 🔥 Appel à ton API pour valider l’énigme
+    const response = await fetch("/api/enigme/validate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        partieId: Number.parseInt(partieId),
+        enigmeId: 2 
+      })
+    })
+
+    if (!response.ok) {
+      throw new Error("Erreur lors de la validation en base.")
+    }
+
+    // ✅ Succès
+    alert("Bravo ! Énigme validée. Retour à l'accueil...")
+    window.location.href = "/accueil" // redirige vers la page d'accueil (modifiable)
+  } catch (error) {
+    console.error("Erreur de validation :", error)
+    alert("Une erreur est survenue lors de la validation.")
+  } finally {
+    setLoading(false)
+  }
+}
+
 
   return (
     <div 
