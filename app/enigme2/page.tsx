@@ -4,6 +4,8 @@ import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Sparkles } from "lucide-react"
+import { useTimer } from "@/context/TimerContext"
+
 
 
 const QUESTIONS = [
@@ -67,8 +69,13 @@ export default function Enigme5Page() {
   const [quizCompleted, setQuizCompleted] = useState(false)
   const [showCelebration, setShowCelebration] = useState(false)
   const [loading, setLoading] = useState(false)
-
+  const { timeLeft, formatTime } = useTimer()
   const [showSolution, setShowSolution] = useState(false)
+  const [showYTVideo, setShowYTVideo] = useState(false)
+
+  const toggleYTVideo = () => {
+    setShowYTVideo(!showYTVideo)
+  }
   
   // Taquin state
   const [tiles, setTiles] = useState<number[]>([])
@@ -197,6 +204,39 @@ export default function Enigme5Page() {
   <div className="absolute inset-0 bg-black/20" />
         
 
+      {/* Bouton "En apprendre plus" */}
+<button
+  onClick={toggleYTVideo}
+  className="fixed top-4 left-4 z-50 bg-gradient-to-br from-amber-900/98 to-orange-900/98 border-2 border-amber-400/50 rounded-2xl p-4 shadow-2xl backdrop-blur-md text-white hover:text-orange-200 hover:bg-white/10"
+>
+  En apprendre plus
+</button>
+
+{/* Bulle avec la vidéo YouTube */}
+{showYTVideo && (
+  <div className="fixed top-24 left-6 z-50">
+    <div className="relative bg-gradient-to-br from-amber-900/95 to-orange-900/95 border-2 border-amber-400/50 rounded-3xl p-3 shadow-2xl w-[580px] backdrop-blur-sm">
+      
+      {/* Petite flèche de la bulle */}
+      <div className="absolute -top-3 left-10 w-0 h-0 border-l-[15px] border-l-transparent border-b-[15px] border-b-amber-900 border-r-[15px] border-r-transparent"></div>
+
+      {/* Contenu : Vidéo */}
+      <div className="rounded-2xl overflow-hidden border border-amber-400/30 shadow-lg">
+        <iframe
+          width="560"
+          height="315"
+          src="https://www.youtube.com/embed/S8SG5_f27OM"
+          title="Vidéo sur Pétra"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+        ></iframe>
+      </div>
+    </div>
+  </div>
+)}
+
+
         
           {/* Overlay sombre pour lisibilité */}
           
@@ -227,7 +267,7 @@ export default function Enigme5Page() {
           </Button>
 
           
-
+        
           {/* Quiz Phase */}
           {!quizCompleted && !showCelebration && (
             <div className="fixed bottom-0 left-0 right-0 flex items-end justify-center p-4 pointer-events-none">
@@ -261,6 +301,13 @@ export default function Enigme5Page() {
                   </div>
                 </div>
               </div>
+
+
+            {/* Timer */}
+            <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
+              ⏱️ {formatTime(timeLeft)}
+            </div>
+
 
               {/* Quiz Card - centered and at bottom */}
               <Card className="pointer-events-auto w-full max-w-2xl bg-gradient-to-br from-orange-950/98 to-amber-950/98 border-2 border-orange-400/50 shadow-2xl backdrop-blur-md">
@@ -436,7 +483,7 @@ export default function Enigme5Page() {
                 <div className="bg-white/10 rounded-xl p-8 mb-6 border-2 border-green-300">
                   <p className="text-green-200 mb-3 text-lg">Voici ta lettre mystère :</p>
                   <div className="text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-yellow-300">
-                    P
+                    U
                   </div>
                 </div>
                 <Button
