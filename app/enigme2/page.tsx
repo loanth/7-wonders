@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Sparkles } from "lucide-react"
 import { useTimer } from "@/context/TimerContext"
+import router from "next/router"
 
 
 
@@ -72,6 +73,7 @@ export default function Enigme5Page() {
   const { timeLeft, formatTime } = useTimer()
   const [showSolution, setShowSolution] = useState(false)
   const [showYTVideo, setShowYTVideo] = useState(false)
+   const [lives, setLives] = useState(3) // 💜 Ajout des vies
 
   const toggleYTVideo = () => {
     setShowYTVideo(!showYTVideo)
@@ -167,6 +169,13 @@ export default function Enigme5Page() {
         setShowResult(false)
         setSelectedAnswer(null)
         setIsCorrect(null)
+        setLives(prev => {
+        const nextLives = prev - 1
+        if (nextLives <= 0){
+          alert("Tu as perdu toutes tes vies ! Retour à l'accueil...")
+           router.push("/accueil")}
+        return nextLives
+      })
       }, 2000)
     }
   }
@@ -332,7 +341,7 @@ export default function Enigme5Page() {
 
             {/* Timer */}
             <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
-              ⏱️ {formatTime(timeLeft)}
+              ⏱️ {formatTime(timeLeft)} | ❤️ {lives}
             </div>
 
 
@@ -413,7 +422,7 @@ export default function Enigme5Page() {
 {quizCompleted && !showCelebration && (
   <div className="flex flex-col items-center">
     <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
-              ⏱️ {formatTime(timeLeft)}
+              ⏱️ {formatTime(timeLeft)} | ❤️ {lives}
             </div>
     <Card className="bg-black/40 p-6 rounded-2xl backdrop-blur-md border-2 border-orange-300/50 shadow-2xl mb-4">
       <div className="text-center mb-4">
@@ -502,7 +511,7 @@ export default function Enigme5Page() {
             <Card className="bg-gradient-to-br from-green-900/95 to-emerald-900/95 border-2 border-green-400 shadow-2xl backdrop-blur-md animate-pulse">
               <CardContent className="p-8 md:p-12 text-center">
                 <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
-              ⏱️ {formatTime(timeLeft)}
+              ⏱️ {formatTime(timeLeft)} | ❤️ {lives}
             </div>
                 <div className="text-6xl mb-4">🏆</div>
                 <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">

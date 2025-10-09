@@ -40,6 +40,9 @@ export default function Enigme6Page() {
   const [loading, setLoading] = useState(false)
   const [showObjects, setShowObjects] = useState(false)
 
+  // Ajout du compteur de vies 🔥
+  const [lives, setLives] = useState(3)
+
   const dialogues = [
     "Oh... un voyageur ? Héhé, ça faisait longtemps qu’un humain n’avait gravi ces marches...",
     "Je suis Llamaq, le gardien mystique du Machu Picchu, protecteur des secrets du Soleil.",
@@ -73,13 +76,12 @@ export default function Enigme6Page() {
         setDialogueIndex(prev => {
           if (prev < dialogues.length - 1) return prev + 1
           else {
-            setDialogueFinished(true) // le dernier dialogue disparaît
+            setDialogueFinished(true)
             return prev
           }
         })
       }
     }
-
     window.addEventListener("keydown", handleNext)
     window.addEventListener("click", handleNext)
     return () => {
@@ -111,26 +113,37 @@ export default function Enigme6Page() {
     }
   }, [foundObjects, currentPopup])
 
-  // Quiz
+  // --- GESTION DU QUIZ AVEC VIES ET BLOQUAGE 🔥 ---
   const handleAnswer = (option: string) => {
+    if (selectedOption) return // empêche le spam
+
     setSelectedOption(option)
+
     if (option === quiz[quizIndex].answer) {
       setScore(s => s + 1)
-      setFeedback("✅ Correct !")
-    } else {
-      setFeedback(`❌ Mauvaise réponse... La bonne réponse était : ${quiz[quizIndex].answer}`)
-    }
-
-    setTimeout(() => {
-      setFeedback(null)
-      if (quizIndex < quiz.length - 1) {
-        setQuizIndex(q => q + 1)
+      setFeedback("✅ Bonne réponse !")
+      setTimeout(() => {
+        setFeedback(null)
         setSelectedOption(null)
-      } else {
-        setShowQuiz(false)
-        setShowMap(true)
+        if (quizIndex < quiz.length - 1) {
+          setQuizIndex(q => q + 1)
+        } else {
+          setShowQuiz(false)
+          setShowMap(true)
+        }
+      }, 1000)
+    } else {
+      // Mauvaise réponse
+      setLives(l => l - 1)
+      setFeedback(`❌ Mauvaise réponse... Essaie encore ! (${lives - 1} vies restantes)`)
+      setSelectedOption(null)
+
+      // Si plus de vies → retour à l'accueil
+      if (lives - 1 <= 0) {
+        alert("Tu as épuisé toutes tes vies ! Tu vas être redirigé vers l'accueil.")
+        setTimeout(() => router.push("/accueil"), 1000)
       }
-    }, 1500)
+    }
   }
 
   const handleValidate = async () => {
@@ -158,8 +171,10 @@ export default function Enigme6Page() {
     >
       {/* Timer */}
       <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
-        ⏱️ {formatTime(timeLeft)}
+        ⏱️ {formatTime(timeLeft)} | ❤️ {lives}
       </div>
+
+      
 
       {/* Artefacts */}
       {objects.map(obj => (
@@ -169,14 +184,18 @@ export default function Enigme6Page() {
           alt={obj.name}
           onClick={() => handleFindObject(obj.id)}
           className={`absolute w-12 h-12 cursor-pointer transition-all duration-500 ${
-            foundObjects.includes(obj.id) ? "opacity-0 scale-125 pointer-events-none" : showObjects ? "opacity-80 hover:scale-110 pointer-events-auto" : "opacity-0 pointer-events-none"
+            foundObjects.includes(obj.id)
+              ? "opacity-0 scale-125 pointer-events-none"
+              : showObjects
+              ? "opacity-80 hover:scale-110 pointer-events-auto"
+              : "opacity-0 pointer-events-none"
           }`}
           style={{ top: obj.top, left: obj.left, zIndex: 10 }}
         />
       ))}
 
       {!currentPopup && (
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-black/60 px-6 py-3 rounded-full text-lg z-20">
+        <div className="absolute top-6 left-1/10 -translate-x-1/2 bg-black/60 px-6 py-3 rounded-full text-lg z-20">
           Artefacts trouvés : {foundObjects.length} / {objects.length}
         </div>
       )}
@@ -217,7 +236,12 @@ export default function Enigme6Page() {
           <p className="mb-4">{quiz[quizIndex].question}</p>
           <div className="flex flex-col gap-2">
             {quiz[quizIndex].options.map(option => (
-              <Button key={option} onClick={() => handleAnswer(option)} className={selectedOption === option ? "bg-yellow-500" : ""}>
+              <Button
+                key={option}
+                onClick={() => handleAnswer(option)}
+                disabled={!!selectedOption}
+                className={selectedOption === option ? "bg-yellow-500" : ""}
+              >
                 {option}
               </Button>
             ))}
@@ -263,9 +287,9 @@ export default function Enigme6Page() {
           <img src="/img6/pngtree-funny-peruvian-llama-alpaca-kids-cartoon-character-png-image_12531923.png" alt="Llamaq" className="w-64 h-64 mb-4" />
           <h1 className="text-4xl font-bold mb-4">Bravo, explorateur !</h1>
           <p className="text-xl mb-4">
-            Tu as retrouvé les cinq artefacts sacrés, répondu au quiz et exploré Machu Picchu !<br/>
-            Score : {score} / {quiz.length}<br/>
-            Le Soleil te révèle la lettre mystique : <span className="text-yellow-300 font-bold text-2xl">U</span>
+            Tu as retrouvé les cinq artefacts sacrés, répondu au quiz et exploré Machu Picchu !<br />
+            Score : {score} / {quiz.length}<br />
+            Le Soleil te révèle la lettre mystique : <span className="text-yellow-300 font-bold text-2xl">T</span>
           </p>
           <Button onClick={() => { handleValidate(); router.push("/accueil") }} size="lg">Retour à l'accueil</Button>
         </div>

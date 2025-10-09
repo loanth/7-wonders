@@ -85,20 +85,39 @@ const questions = [
 
 
   const handleAnswerSelect = (answer: string) => {
-    setSelectedAnswer(answer)
-  }
+  setSelectedAnswer(answer)
 
-  const handleNextQuestion = () => {
+  if (answer === questions[currentQuestion].correct) {
+    // Réponse correcte → on peut passer à la suivante après un petit délai pour voir le feedback
+
+  } else {
+    // Réponse fausse → enlève une vie et reset la sélection après un délai
+    setLives(prev => prev - 1)
+    
+  }
+}
+
+
+  const [lives, setLives] = useState(3) // tu peux changer le nombre de vies initial
+  useEffect(() => {
+    if (lives <= 0) {
+      alert("Tu as perdu toutes tes vies ! Retour à l'accueil...")
+      router.push("/accueil")
+    }
+  }, [lives])
+   const handleNextQuestion = () => {
     if (selectedAnswer === questions[currentQuestion].correct) {
       if (currentQuestion < questions.length - 1) {
         setCurrentQuestion(currentQuestion + 1)
         setSelectedAnswer(null)
       } else {
         setQuizCompleted(true)
-        setTimeout(() => {
-          setShowSudoku(true)
-        }, 2000)
+        setTimeout(() => setShowSudoku(true), 2000)
       }
+    } else {
+      // mauvais choix -> enlève une vie
+      setLives(lives - 1)
+      setSelectedAnswer(null)
     }
   }
 
@@ -224,7 +243,7 @@ const characterNames = {
 
         {/* Timer */}
       <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
-        ⏱️ {formatTime(timeLeft)}
+        ⏱️ {formatTime(timeLeft)} | ❤️ {lives}
       </div>
 
 

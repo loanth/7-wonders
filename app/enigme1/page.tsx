@@ -19,6 +19,7 @@ export default function Enigme1Page() {
   const [postPhase, setPostPhase] = useState(false)
   const [postDialogueIndex, setPostDialogueIndex] = useState(0)
   const [showVideo, setShowVideo] = useState(false)
+   const [lives, setLives] = useState(3) // 💜 Ajout des vies
 
   const { timeLeft, formatTime } = useTimer()
   const VIDEO_URL = "https://www.youtube.com/embed/bmvxRMYxlhE"
@@ -163,8 +164,19 @@ export default function Enigme1Page() {
 
     setTimeout(() => {
       setFeedback(null)
-      if (quizIndex < quiz.length - 1) setQuizIndex((prev) => prev + 1)
-      else finishQuiz()
+      if (isCorrect) {
+        if (quizIndex < quiz.length - 1) setQuizIndex((prev) => prev + 1)
+        else finishQuiz()
+      } else {
+        setLives((prev) => {
+          const nextLives = prev - 1
+          if (nextLives <= 0) {
+            alert("Tu as perdu toutes tes vies ! Retour à l accueil...")
+            router.push("/accueil")
+          }
+          return nextLives
+        })
+      }
     }, 1500)
   }
 
@@ -196,7 +208,7 @@ export default function Enigme1Page() {
         }}
       >
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-zinc-900/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
-        ⏱️ {formatTime(timeLeft)}
+        ⏱️ {formatTime(timeLeft)} | ❤️ {lives}
       </div>
         <h1 className="text-4xl font-bold">🎉 Félicitations ! 🎉</h1>
         <p className="text-xl">
@@ -262,7 +274,7 @@ export default function Enigme1Page() {
       }}
     >
       <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-zinc-900/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
-        ⏱️ {formatTime(timeLeft)}
+        ⏱️ {formatTime(timeLeft)} | ❤️ {lives}
       </div>
       {!isDialogueFinished && !postPhase && !showQuiz ? (
         <div className="absolute bottom-8 w-[90%] max-w-4xl bg-black/50 backdrop-blur-sm rounded-xl p-6 border border-white/10 text-lg leading-relaxed text-center">
