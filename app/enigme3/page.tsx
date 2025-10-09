@@ -1,12 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ArrowLeft } from "lucide-react"
+import { useTimer } from "@/context/TimerContext"
 
 export default function Enigme3Page() {
   const router = useRouter()
@@ -22,8 +23,8 @@ export default function Enigme3Page() {
   const [quizFeedback, setQuizFeedback] = useState("")
   const [quizCompleted, setQuizCompleted] = useState(false)
   const [enigmeDone, setEnigmeDone] = useState(false)
+   const { timeLeft, formatTime } = useTimer()
 
-  // 💬 Dialogues du guide indien pour l'histoire
   const dialogues = [
     "Namasté ! Bienvenue devant le majestueux Taj Mahal.",
     "Ce monument est un symbole d'amour éternel et de l'architecture indienne.",
@@ -33,7 +34,6 @@ export default function Enigme3Page() {
     "À toi de deviner le nombre A à partir des indices que je vais te laisser."
   ]
 
-  // Quiz
   const quizQuestions = [
     {
       question: "Le Taj Mahal a été construit pour :",
@@ -72,33 +72,13 @@ export default function Enigme3Page() {
     }
   ]
 
-  const correctA = 36 // X+Y=7, X*Y=10 => X²+Y²=29=Z, Z+X+Y=36
-
-  // useEffect(() => {
-  //   const partieId = localStorage.getItem("partieId")
-  //   if (!partieId) {
-  //     router.push("/")
-  //     return
-  //   }
-
-  //   checkEnigmeStatus(partieId)
-  // }, [router])
-
-  const checkEnigmeStatus = async (partieId: string) => {
-    try {
-      const response = await fetch(`/api/partie/${partieId}`)
-      const data = await response.json()
-      if (response.ok) setIsCompleted(data.m3)
-    } catch (error) {
-      console.error("Erreur:", error)
-    }
-  }
+  const correctA = 36
 
   const handleCheckAnswer = () => {
     if (parseInt(userAnswer) === correctA) {
       setQuizFeedback("")
       setFeedback("✅ Bonne réponse !✅")
-      setShowQuizIntro(true) // Lancer intro quiz
+      setShowQuizIntro(true)
     } else {
       setFeedback("❌ Mauvaise réponse, essayez encore !❌")
     }
@@ -147,11 +127,10 @@ export default function Enigme3Page() {
           setQuizFeedback("")
         }, 500)
       } else {
-        // Quiz terminé
         setTimeout(() => {
           setQuizFeedback("")
           setQuizCompleted(true)
-          setEnigmeDone(true) // bloque l'affichage de l'énigme
+          setEnigmeDone(true)
         }, 500)
       }
     } else {
@@ -182,12 +161,16 @@ export default function Enigme3Page() {
         </Button>
       </div>
 
-      {/* 👳‍♂️ Dialogue indien */}
+      {/* 👳‍♂️ Dialogue */}
       {showDialogue && (
         <div
           className="absolute bottom-6 left-6 flex items-end space-x-4 cursor-pointer z-40"
           onClick={handleNextDialogue}
         >
+          {/* Timer */}
+            <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
+              ⏱️ {formatTime(timeLeft)}
+            </div>
           <Image
             src="/ImageEnigme3/image-indien.png"
             alt="Guide indien"
@@ -207,6 +190,10 @@ export default function Enigme3Page() {
       {/* 🧩 Enigme */}
       {!showDialogue && !showQuizIntro && !showQuiz && !enigmeDone && (
         <div className="relative z-20 flex justify-center items-center min-h-screen px-4 md:px-8">
+          {/* Timer */}
+            <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
+              ⏱️ {formatTime(timeLeft)}
+            </div>
           <Card className="bg-white/80 backdrop-blur-md text-gray-800 shadow-2xl max-w-3xl w-full border border-purple-200">
             <CardHeader>
               <CardTitle className="text-3xl text-center">Énigme 3</CardTitle>
@@ -217,12 +204,10 @@ export default function Enigme3Page() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* 🔢 Calcul avec images */}
               <div className="bg-slate-50 p-6 rounded-lg text-gray-800 text-center">
                 <p className="mb-4 text-lg font-semibold text-purple-700">
                   Les symboles de la sagesse :
                 </p>
-
                 <div className="flex flex-col items-center gap-4 mb-4">
                   <div className="flex items-center gap-2">
                     <Image src="/ImageEnigme3/Taj-mahal.png" alt="X" width={60} height={60} />
@@ -256,7 +241,6 @@ export default function Enigme3Page() {
                 <p className="italic mt-2">Quel est le numéro de A ?</p>
               </div>
 
-              {/* 🧮 Réponse et feedback */}
               <div className="space-y-4 text-center">
                 <Input
                   type="number"
@@ -284,9 +268,13 @@ export default function Enigme3Page() {
         </div>
       )}
 
-      {/* 👳‍♂️ Intro quiz après réussite énigme */}
+      {/* 👳‍♂️ Intro quiz */}
       {showQuizIntro && (
         <div className="absolute bottom-6 left-6 flex items-end space-x-4 z-40">
+          {/* Timer */}
+            <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
+              ⏱️ {formatTime(timeLeft)}
+            </div>
           <Image
             src="/ImageEnigme3/image-indien.png"
             alt="Guide indien"
@@ -313,6 +301,10 @@ export default function Enigme3Page() {
       {/* 📝 Quiz */}
       {showQuiz && !quizCompleted && (
         <div className="relative z-20 flex justify-center items-center min-h-screen px-4 md:px-8">
+          {/* Timer */}
+            <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
+              ⏱️ {formatTime(timeLeft)}
+            </div>
           <Card className="bg-white/90 text-gray-800 shadow-2xl max-w-3xl w-full border border-purple-200">
             <CardHeader>
               <CardTitle className="text-2xl text-center">
@@ -320,7 +312,9 @@ export default function Enigme3Page() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-lg text-center font-semibold">{quizQuestions[currentQuestion].question}</p>
+              <p className="text-lg text-center font-semibold">
+                {quizQuestions[currentQuestion].question}
+              </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                 {quizQuestions[currentQuestion].options.map((opt, i) => (
                   <Button key={i} onClick={() => handleQuizAnswer(i)}>
@@ -329,7 +323,11 @@ export default function Enigme3Page() {
                 ))}
               </div>
               {quizFeedback && (
-                <p className={`text-center text-lg ${quizFeedback.includes("✅") ? "text-green-600" : "text-red-600"}`}>
+                <p
+                  className={`text-center text-lg ${
+                    quizFeedback.includes("✅") ? "text-green-600" : "text-red-600"
+                  }`}
+                >
                   {quizFeedback}
                 </p>
               )}
@@ -338,11 +336,51 @@ export default function Enigme3Page() {
         </div>
       )}
 
-      {/* 🎉 Quiz terminé, bouton validation */}
+      {/* 🎉 Quiz terminé + Localisation + Vidéo */}
       {quizCompleted && (
-        <div className="relative z-20 flex flex-col justify-center items-center min-h-screen px-4 md:px-8 text-center gap-4">
-          <p className="text-2xl font-bold text-yellow-400">🎉 Félicitations ! Vous avez terminé le quiz !🎉</p>
-          <Button onClick={handleValidate} disabled={loading} size="lg">
+        <div className="relative z-20 flex flex-col justify-center items-center min-h-screen px-4 md:px-8 text-center gap-8">
+          {/* Timer */}
+            <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
+              ⏱️ {formatTime(timeLeft)}
+            </div>
+          <p className="text-2xl font-bold text-yellow-400">
+            🎉 Félicitations ! Vous avez terminé le quiz ! 🎉
+          </p>
+         <p className="text-2xl font-bold text-yellow-400">
+            La lettre obtenue est : <span className="text-red-600">E</span>
+          </p>
+          {/* 📍 Localisation */}
+          <div className="w-full max-w-3xl">
+            <p className="text-lg font-semibold mb-2">📍 Localisation du Taj Mahal :</p>
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3559.013977070454!2d78.03995327451403!3d27.175144776511516!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3974715f53ab7c8f%3A0xa313c3e88dc3e35a!2sTaj%20Mahal!5e0!3m2!1sfr!2sfr!4v1733769266117!5m2!1sfr!2sfr"
+              width="100%"
+              height="350"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="rounded-xl shadow-lg"
+            ></iframe>
+          </div>
+
+          {/* 🎥 Vidéo */}
+          <div className="w-full max-w-3xl">
+            <p className="text-lg font-semibold mb-2">🎥 Découvrez le Taj Mahal en vidéo :</p>
+            <div className="aspect-video rounded-xl overflow-hidden shadow-lg">
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/xF9xhuldEjA?si=R--Nun9dQdzA0w1G"
+                title="Taj Mahal - Inde"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
+
+          {/* ✅ Bouton Validation */}
+          <Button onClick={handleValidate} disabled={loading} size="lg" className="mt-6">
             {loading ? "Validation..." : "Valider l’énigme"}
           </Button>
         </div>
