@@ -385,6 +385,9 @@ export default function Enigme5Page() {
           {/* Puzzle Phase */}
 {quizCompleted && !showCelebration && (
   <div className="flex flex-col items-center">
+    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
+              ⏱️ {formatTime(timeLeft)}
+            </div>
     <Card className="bg-black/40 p-6 rounded-2xl backdrop-blur-md border-2 border-orange-300/50 shadow-2xl mb-4">
       <div className="text-center mb-4">
         <p className="text-orange-200 text-lg font-semibold">
@@ -468,8 +471,12 @@ export default function Enigme5Page() {
 
           {/* Celebration */}
           {showCelebration && (
+            
             <Card className="bg-gradient-to-br from-green-900/95 to-emerald-900/95 border-2 border-green-400 shadow-2xl backdrop-blur-md animate-pulse">
               <CardContent className="p-8 md:p-12 text-center">
+                <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black/70 backdrop-blur-md border border-purple-500/40 text-purple-300 px-6 py-2 rounded-full shadow-lg font-mono text-lg">
+              ⏱️ {formatTime(timeLeft)}
+            </div>
                 <div className="text-6xl mb-4">🏆</div>
                 <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
                   Félicitations !

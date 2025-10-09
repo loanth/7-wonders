@@ -300,8 +300,72 @@ export default function Home() {
           </div>
         )}
 
-        
+        <h2 className="text-xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">
+  Cliquez sur les pins du globe pour explorer les merveilles.
+</h2>
       </section>
+      <section className="relative pt-0 z-10 px-4 py-16 bg-gradient-to-b from-black via-zinc-950 to-black">
+  {/* 🔹 Section Merveilles Non Terminées */}
+  {partieData && (
+    <div className="max-w-7xl mx-auto mb-20">
+      <div className="flex items-center gap-3 mb-10 animate-fadeInUp">
+        <div className="h-1 w-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-full" />
+        <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-orange-400">
+          Non terminées
+        </h2>
+        <div className="h-1 flex-1 bg-gradient-to-r from-orange-500/50 to-transparent rounded-full" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {wonders
+          .filter((w) => partieData[`m${w.id}`] !== 1)
+          .map((wonder, index) => (
+            <div
+              key={wonder.id}
+              className="animate-fadeInUp"
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              <WonderCard
+                wonder={{
+                  ...wonder,
+                  status:
+                    partieData[`m${wonder.id}`] === 1 ? "completed" : "locked",
+                }}
+              />
+            </div>
+          ))}
+      </div>
+    </div>
+  )}
+
+  {/* 🔹 Section Merveilles Terminées */}
+  {completedWonders.length > 0 && (
+    <div className="max-w-7xl mx-auto">
+      <div className="flex items-center gap-3 mb-10 animate-fadeInUp">
+        <div className="h-1 w-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full" />
+        <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">
+          Terminées
+        </h2>
+        <div className="h-1 flex-1 bg-gradient-to-r from-emerald-500/50 to-transparent rounded-full" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {completedWonders.map((wonder, index) => (
+          <div
+            key={wonder.id}
+            className="animate-fadeInUp"
+            style={{ animationDelay: `${index * 0.1}s` }}
+          >
+            <WonderCard
+              wonder={{
+                ...wonder,
+                status: "completed",
+              }}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+</section>
     </main>
   )
 }
