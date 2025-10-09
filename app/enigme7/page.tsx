@@ -193,7 +193,7 @@ export default function EnigmeRioPage() {
           Tu as percé les mystères de Rio et répondu à toutes les questions !  
           <br />Score : {score} / {quiz.length}
           <br />
-          La lettre mystique t’est révélée : <span className="text-yellow-300 font-bold text-2xl">I</span>
+          La lettre mystique t’est révélée : <span className="text-yellow-300 font-bold text-2xl">LI</span>
         </p>
         <Button onClick={() => router.push("/accueil")} size="lg">Retour à l’accueil</Button>
       </div>
