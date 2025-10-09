@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
-import pool from "@/lib/db"
-import type { ResultSetHeader, RowDataPacket } from "mysql2"
+import pool from "@/lib/db" // ton fichier de connexion PostgreSQL
 
+// POST – création d’une partie
 export async function POST(request: NextRequest) {
   try {
     const { pseudo, public: isPublic } = await request.json()
@@ -10,34 +10,43 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Pseudo requis" }, { status: 400 })
     }
 
-    const connection = await pool.getConnection()
-
+    const client = await pool.connect()
     try {
-      await connection.beginTransaction()
+      await client.query("BEGIN")
 
       // Vérifier si l'utilisateur existe déjà
-      const [existingUsers] = await connection.query<RowDataPacket[]>("SELECT id FROM user WHERE pseudo = ?", [pseudo])
+      const userRes = await client.query(
+        "SELECT id FROM workshop_user WHERE pseudo = $1",
+        [pseudo]
+      )
 
       let userId: number
 
-      if (existingUsers.length > 0) {
-        userId = existingUsers[0].id
+      if (userRes.rows.length > 0) {
+        userId = userRes.rows[0].id
       } else {
         // Créer un nouvel utilisateur
-        const [userResult] = await connection.query<ResultSetHeader>("INSERT INTO user (pseudo) VALUES (?)", [pseudo])
-        userId = userResult.insertId
+        const insertUser = await client.query(
+          "INSERT INTO workshop_user (pseudo) VALUES ($1) RETURNING id",
+          [pseudo]
+        )
+        userId = insertUser.rows[0].id
       }
 
       // Créer une nouvelle partie
-      const [partieResult] = await connection.query<ResultSetHeader>("INSERT INTO partie (public) VALUES (?)", [
-        isPublic ? 1 : 0,
-      ])
-      const partieId = partieResult.insertId
+      const insertPartie = await client.query(
+        "INSERT INTO workshop_partie (public) VALUES ($1) RETURNING id",
+        [isPublic ? true : false]
+      )
+      const partieId = insertPartie.rows[0].id
 
       // Lier l'utilisateur à la partie
-      await connection.query("INSERT INTO user_partie (user_id, partie_id) VALUES (?, ?)", [userId, partieId])
+      await client.query(
+        "INSERT INTO workshop_user_partie (user_id, partie_id) VALUES ($1, $2)",
+        [userId, partieId]
+      )
 
-      await connection.commit()
+      await client.query("COMMIT")
 
       return NextResponse.json({
         success: true,
@@ -46,13 +55,60 @@ export async function POST(request: NextRequest) {
         message: "Partie créée avec succès",
       })
     } catch (error) {
-      await connection.rollback()
+      await client.query("ROLLBACK")
       throw error
     } finally {
-      connection.release()
+      client.release()
     }
   } catch (error) {
-    console.error("Erreur lors de la création de la partie:", error)
-    return NextResponse.json({ error: "Erreur serveur lors de la création de la partie" }, { status: 500 })
+    console.error("Erreur lors de la création de la partie :", error)
+    return NextResponse.json(
+      { error: "Erreur serveur lors de la création de la partie" },
+      { status: 500 }
+    )
+  }
+}
+
+// GET – récupération d'une partie existante liée à un utilisateur
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const userId = searchParams.get("userId")
+
+    if (!userId) {
+      return NextResponse.json({ error: "userId manquant" }, { status: 400 })
+    }
+
+    const client = await pool.connect()
+    try {
+      // Trouver la partie associée à cet utilisateur
+      const userPartieRes = await client.query(
+        "SELECT partie_id FROM workshop_user_partie WHERE user_id = $1 LIMIT 1",
+        [userId]
+      )
+
+      if (userPartieRes.rows.length === 0) {
+        return NextResponse.json({ error: "Aucune partie trouvée pour cet utilisateur" }, { status: 404 })
+      }
+
+      const partieId = userPartieRes.rows[0].partie_id
+
+      // Récupérer les infos de la table partie
+      const partieRes = await client.query(
+        "SELECT * FROM workshop_partie WHERE id = $1",
+        [partieId]
+      )
+
+      if (partieRes.rows.length === 0) {
+        return NextResponse.json({ error: "Partie introuvable" }, { status: 404 })
+      }
+
+      return NextResponse.json({ partie: partieRes.rows[0] })
+    } finally {
+      client.release()
+    }
+  } catch (error) {
+    console.error("Erreur lors de la récupération de la partie :", error)
+    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 })
   }
 }
