@@ -21,7 +21,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: "Partie non trouvée" }, { status: 404 })
     }
 
-    return NextResponse.json(result.rows[0])
+    // 🔹 Affiche ce qui est récupéré
+    console.log("Résultat DB:", result.rows[0])
+
+    // 💡 renvoyer sous la clé "partie" pour correspondre à ton front
+    return NextResponse.json({ partie: result.rows[0] })
   } catch (error) {
     console.error("Erreur lors de la récupération de la partie :", error)
     return NextResponse.json(
