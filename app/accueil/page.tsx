@@ -7,6 +7,7 @@ import { WonderCard } from "@/components/wonder-card"
 import { wonders } from "@/lib/wonders"
 import { Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import SplineScene2 from "@/components/SplineScene2"
 
 export default function Home() {
   const searchParams = useSearchParams()
@@ -149,21 +150,19 @@ export default function Home() {
 // 🎉 Écran final de félicitations
   if (isCompleted) {
     return (
-<main className="min-h-screen flex flex-col justify-center items-center bg-black text-white">
-<h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mb-6 text-center">
-          Félicitations !
-</h1>
-<p className="text-lg text-gray-300 mb-10 text-center max-w-md">
-          Tu as retrouvé la <span className="text-purple-400 font-semibold">Clé des Civilisations</span> !
-          Ton voyage à travers les Merveilles touche à sa fin...
-</p>
-<Button
+      <div className="min-h-screen flex flex-col justify-center items-center bg-black text-white">
+
+      <SplineScene2 />
+    
+        <Button
           onClick={() => router.push("../")}
+          style={{ position: 'absolute', bottom: 0, }}
           className="bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:scale-105 transition-transform"
->
+        >
           Retour à la connexion
-</Button>
-</main>
+        </Button>
+    
+</div>
     )
   }
 
