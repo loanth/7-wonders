@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Sparkles } from "lucide-react"
 import { useTimer } from "@/context/TimerContext"
-import router from "next/router"
+import { useRouter } from "next/navigation"
 
 
 
@@ -74,6 +74,7 @@ export default function Enigme5Page() {
   const [showSolution, setShowSolution] = useState(false)
   const [showYTVideo, setShowYTVideo] = useState(false)
    const [lives, setLives] = useState(3) // 💜 Ajout des vies
+   const router = useRouter()
 
   const toggleYTVideo = () => {
     setShowYTVideo(!showYTVideo)
