@@ -243,7 +243,7 @@ export default function EnigmeRioPage() {
 
       {/* Différences compteur */}
       {isDialogueFinished && !postPhase && !showQuiz && !showVideo && !showMap && (
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-black/60 px-6 py-3 rounded-full text-lg">
+        <div className="absolute top-6 left-1/10 -translate-x-1/2 bg-black/60 px-6 py-3 rounded-full text-lg z-20">
           Différences trouvées : {foundDiffs.length} / {differences.length}
         </div>
       )}
@@ -252,7 +252,7 @@ export default function EnigmeRioPage() {
       <img
         src="/img7/adorable-samba-queens-in-rio-carnival-parade-clipart-free-png.webp"
         alt="Zeca"
-        className="absolute bottom-0 right-0 h-90 select-none pointer-events-none"
+        className="absolute bottom-0 right-0 h-70 select-none pointer-events-none"
       />
 
       {/* Dialogues / quiz / vidéo / map */}
