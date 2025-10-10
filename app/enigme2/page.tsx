@@ -295,13 +295,7 @@ export default function Enigme5Page() {
 
       <div className="relative z-10 min-h-screen p-4 md:p-8">
         <div className="max-w-6xl mx-auto">
-          <Button
-            variant="ghost"
-            className="mb-6 text-white hover:text-orange-200 hover:bg-white/10"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Retour aux énigmes
-          </Button>
+         
 
           
         
